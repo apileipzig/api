@@ -5,3 +5,4 @@ ActiveRecord::Base.establish_connection(
     :password => "",
     :database => "api"
 )
+
