@@ -32,7 +32,6 @@ get '/:model/:action' do
 	if ![ "create", "read", "update", "delete" ].include?(params[:action])
 		error 404
 	end
-	# TODO: Split code into different functions depending on :action
 	
 	# get user
 	user = User.find(:first, :conditions => [ "single_access_token = ?", params[:key]])
@@ -41,11 +40,12 @@ get '/:model/:action' do
 	error 401 if user.nil?
 
 	# get permissions
-	permissions = Permission.find(:all, :joins=> :users, :conditions => {:access => "read", :tabelle => params[:model], :users => { :id => user.id } }) 
+	permissions = Permission.find(:all, :joins=> :users, :conditions => {:access => params[:action], :tabelle => params[:model], :users => { :id => user.id } }) 
 	if permissions.size == 0
 		error 403
 	end
 
+	# TODO: Split code into different functions depending on :action
 
 	# check for paramters like size or columns
 	if params[:size]	# returns length of table
