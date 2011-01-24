@@ -1,42 +1,49 @@
 require 'rubygems'
 require 'sinatra'
-#require 'json'
 require 'active_record'
-require 'memcache'
 
-load 'config.rb'
-load 'models.rb'
-load 'helpers.rb'
+require 'config.rb'
+require 'models.rb'
+require 'helpers.rb'
+
+
+error 403 do
+	"#{Hash['error'=>'No permissions found'].to_json()}"
+end
+
+error 401 do
+	"#{Hash['error'=>'Authentication failed'].to_json()}"
+end
+
+error 404 do
+	"#{Hash['error'=>'No valid route'].to_json()}"
+end
+
 
 # the routes
 get '/' do
-  'Sorry, this is not allowed'
-end
-get '/:model' do
-  'Sorry, this is not allowed'
+	error 404
 end
 
 # all models (API tables) belong here
-get '/:model/' do
+get '/:model/:action' do
 	logger(params[:key],params[:model])
 
-	# memcache
-	@cache = MemCache.new("localhost:11211", :namespace => 'Sinatra/')
-	buildCache()
-	
+	if ![ "create", "read", "update", "delete" ].include?(params[:action])
+		error 404
+	end
+	# TODO: Split code into different functions depending on :action
 	
 	# get user
 	user = User.find(:first, :conditions => [ "single_access_token = ?", params[:key]])
 
 	# check if token is valid
-	if user == nil
-		abort("wrong token")
-	end
+	error 401 if user.nil?
 
 	# get permissions
 	permissions = Permission.find(:all, :joins=> :users, :conditions => {:access => "read", :tabelle => params[:model], :users => { :id => user.id } }) 
 	if permissions.size == 0
-		abort("no permissions found")
+		error 403
 	end
 
 
