@@ -19,6 +19,10 @@ error 404 do
 	"#{Hash['error'=>'No valid route'].to_json()}"
 end
 
+error 405 do
+	"#{Hash['error'=>'wrong parameter format'].to_json()}"
+end
+
 
 # the routes
 get '/' do
@@ -33,12 +37,15 @@ get '/:model/:action' do
 		error 404
 	end
 	
+	# check token
+	error 401 if !params[:key].match(/^[A-Za-z0-9]*$/)	#TODO: Limit token length?
 	# get user
 	user = User.find(:first, :conditions => [ "single_access_token = ?", params[:key]])
-
-	# check if token is valid
+	# check if user exists
 	error 401 if user.nil?
 
+	# regex table
+	error 405 if !params[:model].match(/^[A-Za-z0-9]*$/)
 	# get permissions
 	permissions = Permission.find(:all, :joins=> :users, :conditions => {:access => params[:action], :tabelle => params[:model], :users => { :id => user.id } }) 
 	if permissions.size == 0
@@ -66,10 +73,18 @@ get '/:model/:action' do
 
 		##### optional parameters #####
 		# limit
-		limit =  params[:limit]==nil ? 10 : params[:limit].to_i;
+		if params[:limit]!=nil
+			error 405 if !params[:limit].to_s.match(/^[0-9]*$/)
+			limit = params[:limit].to_i;
+		else
+			limit = 10
+		end
+		
 		where = Hash.new()
 		# id (one or comma separated)
+		
 		if params[:id]!=nil
+			error 405 if !params[:id].to_s.match(/^[0-9,]*$/)
 			where["id"] = params[:id].split(',')#to_i
 		end
 
