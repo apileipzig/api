@@ -1,0 +1,7 @@
+database: api
+adapter: mysql
+host: localhost
+username: db_user
+password: db_pass
+encoding: utf8
+

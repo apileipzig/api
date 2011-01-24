@@ -1,0 +1,14 @@
+environment: production
+chdir: /var/www/api
+address: 127.0.0.1
+user: www-data
+group: www-data
+port: 4567
+pid: /var/www/api/server.pid
+rackup: /var/www/api/config.ru
+log: /var/www/api/api.log
+max_conns: 1024
+timeout: 30
+max_persistent_conns: 512
+daemonize: true
+
