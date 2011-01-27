@@ -50,7 +50,7 @@ namespace :db do
     end
 
   desc "create an ActiveRecord migration in ./db/migrate"
-  task :create_migration => :load_config do
+  task :create_migration do
     name = ENV['NAME']
     abort("no NAME specified. use `rake db:create_migration NAME=create_users`") if !name
 

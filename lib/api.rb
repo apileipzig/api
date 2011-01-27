@@ -17,10 +17,12 @@ require 'lib/config'
 
 	#request a list in rest/rails style
 	get '/:model' do
-		logger(params[:key],params[:model])
+		logger 'api_key' => params[:api_key], 'model' => params[:model]
 		validate params
-		Datatable.set_table_name("data_#{params[:model]}")
-		output Datatable.find(:all, :select => only_permitted_columns, :limit => params[:limit]), params[:format]
+		
+		#Datatable.set_table_name("data_#{params[:model]}")
+		puts params[:model].singularize.capitalize
+		output params[:model].singularize.capitalize.constantize.all(:select => only_permitted_columns, :limit => params[:limit]), params[:format]
 	end
 
 	#per model requests
@@ -50,15 +52,15 @@ require 'lib/config'
 	#TODO: validate if model exists (or let the error "No permission(s) to do this." for now)
 	def validate params
 
-		throw_error 401 if params[:key].nil?
-		throw_error 405 unless params[:key].match(/^[A-Za-z0-9]*$/)
+		throw_error 401 if params[:api_key].nil?
+		throw_error 405 unless params[:api_key].match(/^[A-Za-z0-9]*$/)
 		throw_error 405 unless params[:model].match(/^[A-Za-z0-9]*$/)
 	
 	
 		throw_error 405 unless params[:limit].match(/^[0-9]*$/) unless params[:limit].nil?
 		params[:limit] = 10 if params[:limit].to_i > 10 unless params[:limit].nil?
 
-		@user = User.find(:first, :conditions => [ "single_access_token = ?", params[:key]])
+		@user = User.find(:first, :conditions => [ "single_access_token = ?", params[:api_key]])
 		throw_error 401 if @user.nil?
 	
 		#TODO: connect permissions and user through the models (rails style)

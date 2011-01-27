@@ -32,7 +32,7 @@ class CreateDataTables < ActiveRecord::Migration
 			t.timestamps
 		end
 
-		create_table :branches do |t| # kein data_ prefix weil personen nur über das unternehmen gefunden werden können
+		create_table :data_branches do |t|
 			t.integer			:parent_id
 			t.integer			:cluster_id		#Clustereinteilung der Stadt Leipzig, Medienhandbuch ist imemr cluster_id = 1
 			t.string			:internal_key	#interner Schlüssel der Stadt Leipzig z.b. A1 oder F5
@@ -45,7 +45,7 @@ class CreateDataTables < ActiveRecord::Migration
   def self.down
     drop_table	:data_companies
 		drop_table	:persons
-		drop_table	:branches
+		drop_table	:data_branches
   end
 end
 
