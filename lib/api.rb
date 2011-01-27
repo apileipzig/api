@@ -31,13 +31,19 @@ require 'lib/config'
 
 	#per model requests
 	#create
-	post '/:model/:id' do
+	post '/:model' do
 		#TODO
 	end
 
 	#read
 	get '/:model/:id' do
-		#TODO
+		logger 'api_key' => params[:api_key], 'model' => params[:model], 'method' => 'get'
+		validate params
+		if(params[:model].singularize.capitalize.constantize.exists?(params[:id]))
+			output params[:model].singularize.capitalize.constantize.find(params[:id], :select => only_permitted_columns), params[:format]
+		else
+			output({"warning" => "Couldn\'t find record with ID=#{params[:id]}"})
+		end
 	end
 
 	#update
@@ -49,7 +55,11 @@ require 'lib/config'
 	delete '/:model/:id' do
 		logger 'api_key' => params[:api_key], 'model' => params[:model], 'method' => 'delete'
 		validate_delete params
-		output params[:model].singularize.capitalize.constantize.delete(params[:id]), params[:format] #TODO: More useful output than 0 and 1 ?
+		if(params[:model].singularize.capitalize.constantize.delete(params[:id]) == 1)
+			output({"notice" => "Deleted record with ID=#{params[:id]}"})
+		else
+			output({"warning" => "Couldn\'t find record with ID=#{params[:id]}"})
+		end
 	end
 
 	private
@@ -66,7 +76,7 @@ require 'lib/config'
 			throw_error 405 unless params[:page].match(/^[0-9]*$/)
 			params[:limit] = 10 # = page size
 			params[:page] = params[:page].to_i * 10	#TODO: first page should be 1 or 0 ? (is 0)
-		else	
+		else
 			throw_error 405 unless params[:limit].match(/^[0-9]*$/) unless params[:limit].nil?
 			params[:limit] = 10 if params[:limit].to_i > 10 unless params[:limit].nil?
 		end
@@ -80,7 +90,7 @@ require 'lib/config'
 	end
 
 	def validate_delete params
-		
+	
 		throw_error 401 if params[:api_key].nil?
 		throw_error 405 unless params[:api_key].match(/^[A-Za-z0-9]*$/)
 		throw_error 405 unless params[:model].match(/^[A-Za-z0-9]*$/)
