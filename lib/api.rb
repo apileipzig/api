@@ -6,7 +6,7 @@ require 'lib/config'
 
 #TODO:
 #add config.yml / ensure that there is a db connection
-#do paging
+#add function to return page count
 #handle put, post, delete requests ('/:model/:id')
 ##validate which columns can be changed / are needed
 #handle parametrized requests (do this in a generic way, which means allow every parameter which is a table column of the model too)
@@ -26,7 +26,7 @@ require 'lib/config'
 		
 		#Datatable.set_table_name("data_#{params[:model]}")
 		puts params[:model].singularize.capitalize
-		output params[:model].singularize.capitalize.constantize.all(:select => only_permitted_columns, :limit => params[:limit]), params[:format]
+		output params[:model].singularize.capitalize.constantize.all(:select => only_permitted_columns, :limit => params[:limit], :offset => params[:page]), params[:format]
 	end
 
 	#per model requests
@@ -60,9 +60,15 @@ require 'lib/config'
 		throw_error 405 unless params[:api_key].match(/^[A-Za-z0-9]*$/)
 		throw_error 405 unless params[:model].match(/^[A-Za-z0-9]*$/)
 	
-	
-		throw_error 405 unless params[:limit].match(/^[0-9]*$/) unless params[:limit].nil?
-		params[:limit] = 10 if params[:limit].to_i > 10 unless params[:limit].nil?
+		if(!params[:page].nil?)
+			throw_error 405 unless params[:page].match(/^[0-9]*$/)
+			params[:limit] = 10 # = page size
+			params[:page] = params[:page].to_i *10	#TODO: first page should be 1 or 0 ? (is 0)
+			puts params[:page]
+		else	
+			throw_error 405 unless params[:limit].match(/^[0-9]*$/) unless params[:limit].nil?
+			params[:limit] = 10 if params[:limit].to_i > 10 unless params[:limit].nil?
+		end
 
 		@user = User.find(:first, :conditions => [ "single_access_token = ?", params[:api_key]])
 		throw_error 401 if @user.nil?
