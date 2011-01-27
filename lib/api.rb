@@ -48,6 +48,8 @@ require 'lib/config'
 	#delete
 	delete '/:model/:id' do
 		logger 'api_key' => params[:api_key], 'model' => params[:model], 'method' => 'delete'
+		validate_delete params
+		output params[:model].singularize.capitalize.constantize.delete(params[:id]), params[:format] #TODO: More useful output than 0 and 1 ?
 	end
 
 	private
@@ -75,6 +77,20 @@ require 'lib/config'
 		#TODO: connect permissions and user through the models (rails style)
 		@permissions = Permission.find(:all, :joins=> :users, :conditions => {:access => get_action(request.env['REQUEST_METHOD']), :tabelle => params[:model], :users => { :id => @user.id } })
 		throw_error 403 if @permissions.empty?
+	end
+
+	def validate_delete params
+		
+		throw_error 401 if params[:api_key].nil?
+		throw_error 405 unless params[:api_key].match(/^[A-Za-z0-9]*$/)
+		throw_error 405 unless params[:model].match(/^[A-Za-z0-9]*$/)
+		throw_error 405 unless params[:id].match(/^[0-9]*$/)
+
+		@user = User.find(:first, :conditions => [ "single_access_token = ?", params[:api_key]])
+		throw_error 401 if @user.nil?
+
+		@permissions = Permission.find(:first, :joins=> :users, :conditions => {:access => get_action(request.env['REQUEST_METHOD']), :tabelle => params[:model], :users => { :id => @user.id } })
+		throw_error 403 if @permissions.nil?
 	end
 
 	#error handling
@@ -116,6 +132,7 @@ require 'lib/config'
 			"#{h.to_json()}"
 		end
 	end
+
 
 	#specify only the colums we have rights to
 	def only_permitted_columns
