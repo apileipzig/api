@@ -21,7 +21,7 @@ require 'lib/config'
 
 	#request a list in rest/rails style
 	get '/:model' do
-		logger 'api_key' => params[:api_key], 'model' => params[:model]
+		logger 'api_key' => params[:api_key], 'model' => params[:model], 'method' => 'get'
 		validate params
 		
 		#Datatable.set_table_name("data_#{params[:model]}")
@@ -47,7 +47,7 @@ require 'lib/config'
 
 	#delete
 	delete '/:model/:id' do
-		#TODO
+		logger 'api_key' => params[:api_key], 'model' => params[:model], 'method' => 'delete'
 	end
 
 	private
@@ -63,8 +63,7 @@ require 'lib/config'
 		if(!params[:page].nil?)
 			throw_error 405 unless params[:page].match(/^[0-9]*$/)
 			params[:limit] = 10 # = page size
-			params[:page] = params[:page].to_i *10	#TODO: first page should be 1 or 0 ? (is 0)
-			puts params[:page]
+			params[:page] = params[:page].to_i * 10	#TODO: first page should be 1 or 0 ? (is 0)
 		else	
 			throw_error 405 unless params[:limit].match(/^[0-9]*$/) unless params[:limit].nil?
 			params[:limit] = 10 if params[:limit].to_i > 10 unless params[:limit].nil?
