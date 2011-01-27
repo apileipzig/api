@@ -21,7 +21,7 @@ require 'lib/config'
 
 	#request a list in rest/rails style
 	get '/:model' do
-		logger 'api_key' => params[:api_key], 'model' => params[:model], 'method' => 'get'
+		logger 'api_key' => params[:api_key], 'model' => params[:model]
 		validate params
 		
 		#Datatable.set_table_name("data_#{params[:model]}")
@@ -32,13 +32,25 @@ require 'lib/config'
 	#per model requests
 	#create
 	post '/:model' do
-		#TODO
+		#TODO:
+		#	How to handle db errors (required fields, foreign keys)?
+		#	sanitize post data
+		#	if user wants to add attributes he is not allowed to, throw an error (is currently just ignored)
+		logger 'api_key' => params[:api_key], 'model' => params[:model]
+		validate_post params
+		data = params[:model].singularize.capitalize.constantize.new(create_input_data)
+		if(data.save(:validate=>false)) #TODO: define validation rules
+			output({"notice" => "record is saved with ID=#{data.id}"}) #TODO substitute "id" with pk
+		else
+			output({"error" => "Couldn\'t save record"})
+		end
 	end
 
 	#read
 	get '/:model/:id' do
-		logger 'api_key' => params[:api_key], 'model' => params[:model], 'method' => 'get'
-		validate params
+		logger 'api_key' => params[:api_key], 'model' => params[:model]
+		validate_get params
+		
 		if(params[:model].singularize.capitalize.constantize.exists?(params[:id]))
 			output params[:model].singularize.capitalize.constantize.find(params[:id], :select => only_permitted_columns), params[:format]
 		else
@@ -48,13 +60,33 @@ require 'lib/config'
 
 	#update
 	put '/:model/:id' do
-		#TODO
+		#TODO: see "post"
+		logger 'api_key' => params[:api_key], 'model' => params[:model]
+		validate_put params
+		
+		if(params[:model].singularize.capitalize.constantize.exists?(params[:id]))
+			# TODO: use update, if validation works
+			#puts params[:model].singularize.capitalize.constantize.update(params[:id], create_input_data)
+			data = params[:model].singularize.capitalize.constantize.find(params[:id])
+			create_input_data.each do |column,value|
+				data[column] = value
+			end
+			if(data.save(:validate=>false))
+				output({"notice" => "record is updated with ID=#{params[:id]}"})
+			else
+				output({"error" => "Couldn\'t update record with ID=#{params[:id]}"})
+			end
+		else 
+			output({"warning" => "Couldn\'t find record with ID=#{params[:id]}"})
+		end
+		
 	end
 
 	#delete
 	delete '/:model/:id' do
-		logger 'api_key' => params[:api_key], 'model' => params[:model], 'method' => 'delete'
+		logger 'api_key' => params[:api_key], 'model' => params[:model]
 		validate_delete params
+		
 		if(params[:model].singularize.capitalize.constantize.delete(params[:id]) == 1)
 			output({"notice" => "Deleted record with ID=#{params[:id]}"})
 		else
@@ -85,6 +117,47 @@ require 'lib/config'
 		throw_error 401 if @user.nil?
 	
 		#TODO: connect permissions and user through the models (rails style)
+		@permissions = Permission.find(:all, :joins=> :users, :conditions => {:access => get_action(request.env['REQUEST_METHOD']), :tabelle => params[:model], :users => { :id => @user.id } })
+		throw_error 403 if @permissions.empty?
+	end
+
+	def validate_get params
+
+		throw_error 401 if params[:api_key].nil?
+		throw_error 405 unless params[:api_key].match(/^[A-Za-z0-9]*$/)
+		throw_error 405 unless params[:model].match(/^[A-Za-z0-9]*$/)
+		throw_error 405 unless params[:id].match(/^[0-9]*$/)
+		
+		@user = User.find(:first, :conditions => [ "single_access_token = ?", params[:api_key]])
+		throw_error 401 if @user.nil?
+	
+		@permissions = Permission.find(:all, :joins=> :users, :conditions => {:access => get_action(request.env['REQUEST_METHOD']), :tabelle => params[:model], :users => { :id => @user.id } })
+		throw_error 403 if @permissions.empty?
+	end
+
+	def validate_post params
+
+		throw_error 401 if params[:api_key].nil?
+		throw_error 405 unless params[:api_key].match(/^[A-Za-z0-9]*$/)
+		throw_error 405 unless params[:model].match(/^[A-Za-z0-9]*$/)
+		
+		@user = User.find(:first, :conditions => [ "single_access_token = ?", params[:api_key]])
+		throw_error 401 if @user.nil?
+	
+		@permissions = Permission.find(:all, :joins=> :users, :conditions => {:access => get_action(request.env['REQUEST_METHOD']), :tabelle => params[:model], :users => { :id => @user.id } })
+		throw_error 403 if @permissions.empty?
+	end
+
+	def validate_put params
+
+		throw_error 401 if params[:api_key].nil?
+		throw_error 405 unless params[:api_key].match(/^[A-Za-z0-9]*$/)
+		throw_error 405 unless params[:model].match(/^[A-Za-z0-9]*$/)
+		throw_error 405 unless params[:id].match(/^[0-9]*$/)
+		
+		@user = User.find(:first, :conditions => [ "single_access_token = ?", params[:api_key]])
+		throw_error 401 if @user.nil?
+	
 		@permissions = Permission.find(:all, :joins=> :users, :conditions => {:access => get_action(request.env['REQUEST_METHOD']), :tabelle => params[:model], :users => { :id => @user.id } })
 		throw_error 403 if @permissions.empty?
 	end
@@ -152,4 +225,14 @@ require 'lib/config'
 		end
 		columns
 	end
+
+
+	def create_input_data
+		data = Hash.new()
+		@permissions.each do |per|
+			data[per.spalte] = params[per.spalte] unless params[per.spalte].nil?
+		end
+		data
+	end
+
 
