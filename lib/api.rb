@@ -19,6 +19,14 @@ require 'lib/config'
 		throw_error 405
 	end
 
+	#sync script for data from leipzig.de	
+	get '/sync' do
+		throw_error 405 if params['json'].nil?
+		sync = TempSync.new(:json => params['json'])
+		sync.save(:validate => false)
+		output({"notice" => "record is created"})
+	end
+
 	#request a list in rest/rails style
 	get '/:model' do
 		logger 'api_key' => params[:api_key], 'model' => params[:model]

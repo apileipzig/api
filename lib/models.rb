@@ -22,3 +22,6 @@ end
 class Person < ActiveRecord::Base
 end
 
+class TempSync < ActiveRecord::Base
+end
+
