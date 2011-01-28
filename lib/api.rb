@@ -22,7 +22,7 @@ require 'lib/config'
 	#request a list in rest/rails style
 	get '/:model' do
 		logger 'api_key' => params[:api_key], 'model' => params[:model]
-		validate params
+		validate params, true
 		
 		#Datatable.set_table_name("data_#{params[:model]}")
 		puts params[:model].singularize.capitalize
@@ -37,7 +37,7 @@ require 'lib/config'
 		#	sanitize post data
 		#	if user wants to add attributes he is not allowed to, throw an error (is currently just ignored)
 		logger 'api_key' => params[:api_key], 'model' => params[:model]
-		validate_post params
+		validate params
 		data = params[:model].singularize.capitalize.constantize.new(create_input_data)
 		if(data.save(:validate=>false)) #TODO: define validation rules
 			output({"notice" => "record is saved with ID=#{data.id}"}) #TODO substitute "id" with pk
@@ -49,7 +49,7 @@ require 'lib/config'
 	#read
 	get '/:model/:id' do
 		logger 'api_key' => params[:api_key], 'model' => params[:model]
-		validate_get params
+		validate params, false, true
 		
 		if(params[:model].singularize.capitalize.constantize.exists?(params[:id]))
 			output params[:model].singularize.capitalize.constantize.find(params[:id], :select => only_permitted_columns), params[:format]
@@ -62,7 +62,7 @@ require 'lib/config'
 	put '/:model/:id' do
 		#TODO: see "post"
 		logger 'api_key' => params[:api_key], 'model' => params[:model]
-		validate_put params
+		validate params, false, true
 		
 		if(params[:model].singularize.capitalize.constantize.exists?(params[:id]))
 			# TODO: use update, if validation works
@@ -85,7 +85,7 @@ require 'lib/config'
 	#delete
 	delete '/:model/:id' do
 		logger 'api_key' => params[:api_key], 'model' => params[:model]
-		validate_delete params
+		validate params, false, true
 		
 		if(params[:model].singularize.capitalize.constantize.delete(params[:id]) == 1)
 			output({"notice" => "Deleted record with ID=#{params[:id]}"})
@@ -98,19 +98,22 @@ require 'lib/config'
 
 	#validating every request
 	#TODO: validate if model exists (or let the error "No permission(s) to do this." for now)
-	def validate params
+	def validate params, page_check=false, id_check=false
 
 		throw_error 401 if params[:api_key].nil?
 		throw_error 405 unless params[:api_key].match(/^[A-Za-z0-9]*$/)
 		throw_error 405 unless params[:model].match(/^[A-Za-z0-9]*$/)
-	
-		if(!params[:page].nil?)
-			throw_error 405 unless params[:page].match(/^[0-9]*$/)
-			params[:limit] = 10 # = page size
-			params[:page] = params[:page].to_i * 10	#TODO: first page should be 1 or 0 ? (is 0)
-		else
-			throw_error 405 unless params[:limit].match(/^[0-9]*$/) unless params[:limit].nil?
-			params[:limit] = 10 if params[:limit].to_i > 10 unless params[:limit].nil?
+		throw_error 405 unless params[:id].match(/^[0-9]*$/) if id_check
+
+		if(page_check)
+			if(!params[:page].nil?)
+				throw_error 405 unless params[:page].match(/^[0-9]*$/)
+				params[:limit] = 10 # = page size
+				params[:page] = params[:page].to_i * 10	#TODO: first page should be 1 or 0 ? (is 0)
+			else
+				throw_error 405 unless params[:limit].match(/^[0-9]*$/) unless params[:limit].nil?
+				params[:limit] = 10 if params[:limit].to_i > 10 unless params[:limit].nil?
+			end
 		end
 
 		@user = User.find(:first, :conditions => [ "single_access_token = ?", params[:api_key]])
@@ -119,61 +122,6 @@ require 'lib/config'
 		#TODO: connect permissions and user through the models (rails style)
 		@permissions = Permission.find(:all, :joins=> :users, :conditions => {:access => get_action(request.env['REQUEST_METHOD']), :tabelle => params[:model], :users => { :id => @user.id } })
 		throw_error 403 if @permissions.empty?
-	end
-
-	def validate_get params
-
-		throw_error 401 if params[:api_key].nil?
-		throw_error 405 unless params[:api_key].match(/^[A-Za-z0-9]*$/)
-		throw_error 405 unless params[:model].match(/^[A-Za-z0-9]*$/)
-		throw_error 405 unless params[:id].match(/^[0-9]*$/)
-		
-		@user = User.find(:first, :conditions => [ "single_access_token = ?", params[:api_key]])
-		throw_error 401 if @user.nil?
-	
-		@permissions = Permission.find(:all, :joins=> :users, :conditions => {:access => get_action(request.env['REQUEST_METHOD']), :tabelle => params[:model], :users => { :id => @user.id } })
-		throw_error 403 if @permissions.empty?
-	end
-
-	def validate_post params
-
-		throw_error 401 if params[:api_key].nil?
-		throw_error 405 unless params[:api_key].match(/^[A-Za-z0-9]*$/)
-		throw_error 405 unless params[:model].match(/^[A-Za-z0-9]*$/)
-		
-		@user = User.find(:first, :conditions => [ "single_access_token = ?", params[:api_key]])
-		throw_error 401 if @user.nil?
-	
-		@permissions = Permission.find(:all, :joins=> :users, :conditions => {:access => get_action(request.env['REQUEST_METHOD']), :tabelle => params[:model], :users => { :id => @user.id } })
-		throw_error 403 if @permissions.empty?
-	end
-
-	def validate_put params
-
-		throw_error 401 if params[:api_key].nil?
-		throw_error 405 unless params[:api_key].match(/^[A-Za-z0-9]*$/)
-		throw_error 405 unless params[:model].match(/^[A-Za-z0-9]*$/)
-		throw_error 405 unless params[:id].match(/^[0-9]*$/)
-		
-		@user = User.find(:first, :conditions => [ "single_access_token = ?", params[:api_key]])
-		throw_error 401 if @user.nil?
-	
-		@permissions = Permission.find(:all, :joins=> :users, :conditions => {:access => get_action(request.env['REQUEST_METHOD']), :tabelle => params[:model], :users => { :id => @user.id } })
-		throw_error 403 if @permissions.empty?
-	end
-
-	def validate_delete params
-	
-		throw_error 401 if params[:api_key].nil?
-		throw_error 405 unless params[:api_key].match(/^[A-Za-z0-9]*$/)
-		throw_error 405 unless params[:model].match(/^[A-Za-z0-9]*$/)
-		throw_error 405 unless params[:id].match(/^[0-9]*$/)
-
-		@user = User.find(:first, :conditions => [ "single_access_token = ?", params[:api_key]])
-		throw_error 401 if @user.nil?
-
-		@permissions = Permission.find(:first, :joins=> :users, :conditions => {:access => get_action(request.env['REQUEST_METHOD']), :tabelle => params[:model], :users => { :id => @user.id } })
-		throw_error 403 if @permissions.nil?
 	end
 
 	#error handling
