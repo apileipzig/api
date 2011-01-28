@@ -1,14 +1,31 @@
 require 'active_record'
 config = YAML.load_file('database.yml')
 
+#code borrowed from here: https://github.com/rails/rails/blob/master/activerecord/lib/active_record/railties/databases.rake
+
 namespace :db do
 	desc "create your database"
   task :create do
-    @charset   = ENV['CHARSET']   || 'utf8'
-    @collation = ENV['COLLATION'] || 'utf8_unicode_ci'
-    creation_options = {:charset => (config['charset'] || @charset), :collation => (config['collation'] || @collation)}
-		ActiveRecord::Base.establish_connection(config.merge('database' => nil))
-		ActiveRecord::Base.connection.create_database(config['database'], creation_options)
+		if config['adapter'] =~ /sqlite/
+    	if File.exist?(config['database'])
+      	$stderr.puts "#{config['database']} already exists"
+      else
+        begin
+          # Create the SQLite database
+          ActiveRecord::Base.establish_connection(config)
+          ActiveRecord::Base.connection
+        rescue Exception => e
+          $stderr.puts e, *(e.backtrace)
+          $stderr.puts "Couldn't create database for #{config.inspect}"
+        end
+      end
+    else
+    	@charset   = ENV['CHARSET']   || 'utf8'
+    	@collation = ENV['COLLATION'] || 'utf8_unicode_ci'
+    	creation_options = {:charset => (config['charset'] || @charset), :collation => (config['collation'] || @collation)}
+			ActiveRecord::Base.establish_connection(config.merge('database' => nil))
+			ActiveRecord::Base.connection.create_database(config['database'], creation_options)
+    end
   end
 
   desc "migrate your database"
@@ -22,12 +39,16 @@ namespace :db do
 
   desc 'Drops the database'
   task :drop do
-    begin
-			ActiveRecord::Base.establish_connection(config)
-      ActiveRecord::Base.connection.drop_database config['database']
-    rescue Exception => e
-      $stderr.puts "Couldn't drop #{config['database']} : #{e.inspect}"
-    end
+		begin
+			if config['adapter'] =~ /sqlite/
+    		FileUtils.rm(config['database'])
+			else
+				ActiveRecord::Base.establish_connection(config)
+		    ActiveRecord::Base.connection.drop_database config['database']
+			end
+		rescue Exception => e
+			$stderr.puts "Couldn't drop #{config['database']} : #{e.inspect}"
+		end
   end
 
   desc 'Resets your database using your migrations for the current environment (drop -> create -> migrate)'

@@ -2,3 +2,6 @@ database.yml
 config.yml
 *.pid
 *.log
+.bundle/
+db/*.sqlite3
+

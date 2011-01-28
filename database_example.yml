@@ -1,7 +1,14 @@
-database: api
-adapter: mysql
-host: localhost
-username: db_user
-password: db_pass
-encoding: utf8
+#example for mysql
+#database: api
+#adapter: mysql
+#host: localhost
+#username: db_user
+#password: db_pass
+#encoding: utf8
+
+#example for sqlite3
+#adapter: sqlite3
+#database: db/development.sqlite3
+#pool: 5
+#timeout: 5000
 
