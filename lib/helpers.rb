@@ -1,30 +1,30 @@
 helpers do
 	#validating every request
 	#TODO: validate if model exists (or let the error "No permission(s) to do this." for now)
-	def validate params, page_check=false, id_check=false
-
+	def validate
 		throw_error 401 if params[:api_key].nil?
 		throw_error 405 unless params[:api_key].match(/^[A-Za-z0-9]*$/)
-		throw_error 405 unless params[:model].match(/^[A-Za-z0-9]*$/)
-		throw_error 405 unless params[:id].match(/^[0-9]*$/) if id_check
-
-		if(page_check)
-			if(!params[:page].nil?)
-				throw_error 405 unless params[:page].match(/^[0-9]*$/)
-				params[:limit] = 10 # = page size
-				params[:page] = params[:page].to_i * 10	#TODO: first page should be 1 or 0 ? (is 0)
-			else
-				throw_error 405 unless params[:limit].match(/^[0-9]*$/) unless params[:limit].nil?
-				params[:limit] = 10 if params[:limit].to_i > 10 unless params[:limit].nil?
-			end
-		end
-
+		
+		#first check if a user exists, if not, forget about the rest of validation!
 		@user = User.find(:first, :conditions => [ "single_access_token = ?", params[:api_key]])
 		throw_error 401 if @user.nil?
-	
+		
+		throw_error 405 unless params[:model].match(/^[A-Za-z0-9]*$/)
+
 		#TODO: connect permissions and user through the models (rails style)
 		@permissions = Permission.find(:all, :joins=> :users, :conditions => {:access => get_action(request.env['REQUEST_METHOD']), :tabelle => params[:model], :users => { :id => @user.id } })
 		throw_error 403 if @permissions.empty?
+
+		throw_error 405 unless params[:id].match(/^[0-9]*$/) unless params[:id].nil?
+
+		unless params[:page].nil?
+			throw_error 405 unless params[:page].match(/^[0-9]*$/)
+			params[:limit] = 10 # = page size
+			params[:page] = params[:page].to_i * 10	#TODO: first page should be 1 or 0 ? (is 0)
+		else
+			throw_error 405 unless params[:limit].match(/^[0-9]*$/) unless params[:limit].nil?
+			params[:limit] = 10 if params[:limit].to_i > 10 unless params[:limit].nil?
+		end
 	end
 
 	#error handling
@@ -49,6 +49,7 @@ helpers do
 	#generate resulting output
 	#output data
 	#output data format
+	#TODO: add switch for browsers to display data nice like fb
 	def output *args
 		if args[1] == "xml"
 			content_type 'text/xml', :charset => 'utf-8'
@@ -62,7 +63,7 @@ helpers do
 			else 
 				h = args[0]
 			end
-			content_type 'text/plain', :charset => 'utf-8'
+			content_type 'text/javascript', :charset => 'utf-8'
 			"#{h.to_json()}"
 		end
 	end

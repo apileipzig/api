@@ -3,6 +3,8 @@ config = YAML.load_file('database.yml')
 
 #code borrowed from here: https://github.com/rails/rails/blob/master/activerecord/lib/active_record/railties/databases.rake
 
+#TODO: add seeding / add seed data
+
 namespace :db do
 	desc "create your database"
   task :create do
