@@ -21,8 +21,18 @@ require 'lib/config'
 	#sync script for data from leipzig.de	
 	get '/sync' do
 		throw_error 405 if params['json'].nil?
-		TempSync.create(:json => params['json'])
-		output :success => "record is created"
+		if TempSync.create(:json => params['json'])
+			output :success => "record created."
+		else
+			output :error => "record could not be created."
+		end
+	end
+
+	#temp read
+	get '/sync_read' do
+		count = TempSync.all.length
+		last = TempSync.last
+		"anzahl der datensätze: #{count} <br /><br />letzter datensatz:<br/><br/>id: #{last.id}<br />json: #{last.json}"
 	end
 
 	#request a list in rest/rails style
@@ -30,7 +40,7 @@ require 'lib/config'
 		logger 'api_key' => params[:api_key], 'model' => params[:model]
 		validate
 		
-		output :model => params[:model].singularize.capitalize.constantize.all(:select => only_permitted_columns, :limit => params[:limit], :offset => params[:page])
+		output :data => params[:model].singularize.capitalize.constantize.all(:select => only_permitted_columns, :limit => params[:limit], :offset => params[:page])
 	end
 
 	#per model requests

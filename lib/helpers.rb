@@ -1,6 +1,8 @@
 helpers do
 	#validating every request
 	#TODO: validate if model exists (or let the error "No permission(s) to do this." for now)
+	#TODO: validate format
+	#TODO: write a method which checks every parameter if it consists only of letters and digits, something like validate_only_aplhanumeric params
 	def validate
 		throw_error 401 if params[:api_key].nil?
 		throw_error 405 unless params[:api_key].match(/^[A-Za-z0-9]*$/)
@@ -29,11 +31,13 @@ helpers do
 
 	#error handling
 	def throw_error code
-		#TODO: add more output information here, maybe a help message
-		halt code, output({"error" => "Authentication failed"}) if code == 401
-		halt code, output({"error" => "No permission(s) to do this."}) if code == 403
-		#TODO: add which parameter is wrong or missing
-		halt code, output({"error" => "wrong parameter format"}) if code == 405
+		case code
+			#TODO: add more output information here, maybe a help message
+			when 401: halt code, (output :error => "Authentication failed.")
+			when 403: halt code, (output :error => "No permission(s) to do this.")
+			#TODO: add which parameter is wrong or missing
+			when 405: halt code, (output :error => "wrong parameter format.")
+		end
 	end
 
 	#map request_method to db access names
@@ -50,21 +54,17 @@ helpers do
 	#output data
 	#output data format
 	#TODO: add switch for browsers to display data nice like fb
-	def output *args
-		if args[1] == "xml"
-			content_type 'text/xml', :charset => 'utf-8'
-			"#{args[0].to_xml(:skip_instruct => false, :skip_types => true)}"
-		else
-			#ensure that result is a json object everytime, not a json object or an array of json objects (like facebook)
-			#FIXME: do this in a better and more reliable way
-			h = Hash.new
-			if args[0].is_a?(Array)
-				h['data'] = args[0]
-			else 
-				h = args[0]
-			end
+	def output options={}
+		puts options.inspect
+		
+		if params[:format].nil? or params[:format] != "xml"
+			# JSON
 			content_type 'text/javascript', :charset => 'utf-8'
-			"#{h.to_json()}"
+			options.to_json()
+		else
+			# XML
+			content_type 'text/xml', :charset => 'utf-8'
+			options.to_xml(:skip_instruct => true, :skip_types => true)
 		end
 	end
 
