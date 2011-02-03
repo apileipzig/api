@@ -14,7 +14,7 @@ helpers do
 		throw_error 405 unless params[:model].match(/^[A-Za-z0-9]*$/)
 
 		#TODO: connect permissions and user through the models (rails style)
-		@permissions = Permission.find(:all, :joins=> :users, :conditions => {:access => get_action(request.env['REQUEST_METHOD']), :tabelle => params[:model], :users => { :id => @user.id } })
+		@permissions = @user.permissions #Permission.find(:all, :joins=> :users, :conditions => {:access => get_action(request.env['REQUEST_METHOD']), :tabelle => params[:model], :users => { :id => @user.id } })
 		throw_error 403 if @permissions.empty?
 
 		throw_error 405 unless params[:id].match(/^[0-9]*$/) unless params[:id].nil?

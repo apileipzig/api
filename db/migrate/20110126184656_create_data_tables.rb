@@ -1,7 +1,8 @@
 class CreateDataTables < ActiveRecord::Migration
   def self.up
     create_table :data_companies do |t|
-			t.references	:branch
+			t.references	:sub_market
+			t.references	:main_branch
       t.string			:name										# Name der Firma
 			t.string			:street									# offizieller Straßenname, "-Straße" ausschreiben!
 			t.integer			:housenumber						# nur EINE Zahl, für alles weitere das Feld hausnummer_zusatz verwenden
@@ -39,6 +40,11 @@ class CreateDataTables < ActiveRecord::Migration
 			t.string			:name
 			t.string			:description
 			t.timestamps
+		end
+
+		create_table :companies_branches, :id => false do |t|
+			t.references	:company
+			t.references	:branch
 		end	
   end
 
@@ -46,6 +52,7 @@ class CreateDataTables < ActiveRecord::Migration
     drop_table	:data_companies
 		drop_table	:persons
 		drop_table	:data_branches
+		drop_table	:companies_branches
   end
 end
 

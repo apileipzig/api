@@ -13,6 +13,10 @@ end
 
 class Company < ActiveRecord::Base
 	set_table_name "data_companies"
+	belongs_to :sub_market, :class_name => "Branch"
+	belongs_to :main_branch, :class_name => "Branch"
+	has_and_belongs_to_many :sub_branches, :class_name => "Branch", :limit => 6
+	#TODO maybe we need a validation for creating 6 sub_branches max
 end
 
 class Branch < ActiveRecord::Base
@@ -20,6 +24,7 @@ class Branch < ActiveRecord::Base
 end
 
 class Person < ActiveRecord::Base
+	belongs_to :company
 end
 
 class TempSync < ActiveRecord::Base

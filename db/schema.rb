@@ -12,6 +12,11 @@
 
 ActiveRecord::Schema.define(:version => 20110128124107) do
 
+  create_table "companies_branches", :id => false, :force => true do |t|
+    t.integer "company_id"
+    t.integer "branch_id"
+  end
+
   create_table "data_branches", :force => true do |t|
     t.integer  "parent_id"
     t.integer  "cluster_id"
@@ -23,7 +28,8 @@ ActiveRecord::Schema.define(:version => 20110128124107) do
   end
 
   create_table "data_companies", :force => true do |t|
-    t.integer  "branch_id"
+    t.integer  "sub_market_id"
+    t.integer  "main_branch_id"
     t.string   "name"
     t.string   "street"
     t.integer  "housenumber"
@@ -64,7 +70,7 @@ ActiveRecord::Schema.define(:version => 20110128124107) do
     t.string   "request_path"
     t.string   "query_string"
     t.string   "method"
-    t.datetime "created_at",   :default => '2011-02-03 02:31:00'
+    t.datetime "created_at",   :default => '2011-02-04 00:27:40'
   end
 
   create_table "temp_syncs", :force => true do |t|
