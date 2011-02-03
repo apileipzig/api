@@ -19,3 +19,4 @@ ActiveRecord::Base.establish_connection(YAML.load_file(APP_ROOT + '/database.yml
 require APP_ROOT + '/lib/models.rb'
 require APP_ROOT + '/lib/helpers.rb'
 
+PAGE_SIZE = 10

@@ -14,18 +14,22 @@ helpers do
 		throw_error 405 unless params[:model].match(/^[A-Za-z0-9]*$/)
 
 		#TODO: connect permissions and user through the models (rails style)
-		@permissions = @user.permissions #Permission.find(:all, :joins=> :users, :conditions => {:access => get_action(request.env['REQUEST_METHOD']), :tabelle => params[:model], :users => { :id => @user.id } })
+		@permissions = Permission.find(:all, :joins=> :users, :conditions => {:access => get_action(request.env['REQUEST_METHOD']), :table => params[:model], :users => { :id => @user.id } })
 		throw_error 403 if @permissions.empty?
 
 		throw_error 405 unless params[:id].match(/^[0-9]*$/) unless params[:id].nil?
 
 		unless params[:page].nil?
 			throw_error 405 unless params[:page].match(/^[0-9]*$/)
-			params[:limit] = 10 # = page size
-			params[:page] = params[:page].to_i * 10	#TODO: first page should be 1 or 0 ? (is 0)
+			params[:limit] = PAGE_SIZE
+			params[:page] = params[:page].to_i * PAGE_SIZE	#first page is 0
 		else
 			throw_error 405 unless params[:limit].match(/^[0-9]*$/) unless params[:limit].nil?
-			params[:limit] = 10 if params[:limit].to_i > 10 unless params[:limit].nil?
+			if params[:limit].nil?
+				params[:limit] = PAGE_SIZE
+			else
+				params[:limit] = PAGE_SIZE if params[:limit].to_i > PAGE_SIZE
+			end
 		end
 	end
 
@@ -72,7 +76,7 @@ helpers do
 	def only_permitted_columns
 		columns = Array.new()
 		@permissions.each do |per|
-			columns += [per.spalte]
+			columns += [per.column]
 		end
 		columns
 	end
@@ -80,7 +84,7 @@ helpers do
 	def create_input_data
 		data = Hash.new()
 		@permissions.each do |per|
-			data[per.spalte] = params[per.spalte] unless params[per.spalte].nil?
+			data[per.column] = params[per.column] unless params[per.column].nil?
 		end
 		data
 	end
