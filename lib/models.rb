@@ -1,3 +1,5 @@
+#TODO: Don't forget to add useful validation rules for real data tables
+
 ActiveRecord::Base.include_root_in_json = false # removes table names in json
 
 class User < ActiveRecord::Base

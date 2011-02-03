@@ -5,10 +5,8 @@ Bundler.require(:default)
 require 'lib/config'
 
 #TODO:
-#add function to return page count
 ##validate which columns can be changed / are needed
 #handle parametrized requests (do this in a generic way, which means allow every parameter which is a table column of the model too)
-##add more parameters like limit
 #validate callbacks
 
 	set :root, APP_ROOT
@@ -40,24 +38,28 @@ require 'lib/config'
 		logger 'api_key' => params[:api_key], 'model' => params[:model]
 		validate
 		
-		output :data => params[:model].singularize.capitalize.constantize.all(:select => only_permitted_columns, :limit => params[:limit], :offset => params[:page])
+		if !params[:pageCount].nil?
+			output :pageCount => sprintf("%.f", params[:model].singularize.capitalize.constantize.count / PAGE_SIZE + 0.5)
+		elsif !params[:itemCount].nil?
+			output :itemCount => params[:model].singularize.capitalize.constantize.count
+		else
+			output :data => params[:model].singularize.capitalize.constantize.all(:select => only_permitted_columns, :limit => params[:limit], :offset => params[:page])
+		end
 	end
 
 	#per model requests
 	#create
 	post '/:model' do
 		#TODO:
-		#	How to handle db errors (required fields, foreign keys)?
-		#	sanitize post data
 		#	if user wants to add attributes he is not allowed to, throw an error (is currently just ignored)
 		logger 'api_key' => params[:api_key], 'model' => params[:model]
 		validate
 
 		data = params[:model].singularize.capitalize.constantize.new(create_input_data)
-		if data.save #TODO: define validation rules
-			output :success => "record is saved with ID=#{data.id}" #TODO substitute "id" with pk
+		if data.save
+			output :success => "record is saved with ID=#{data.id()}"
 		else
-			output :error => "Couldn\'t save record"
+			output :error => data.errors
 		end
 	end
 
@@ -80,7 +82,6 @@ require 'lib/config'
 		validate
 		
 		if params[:model].singularize.capitalize.constantize.exists?(params[:id])
-			# TODO: use update, if validation works
 			data = params[:model].singularize.capitalize.constantize.find(params[:id])
 			create_input_data.each do |column,value|
 				data[column] = value
@@ -88,7 +89,7 @@ require 'lib/config'
 			if data.save
 				output :success => "record is updated with ID=#{params[:id]}"
 			else
-				output :error => "Couldn\'t update record with ID=#{params[:id]}"
+				output :error => data.errors
 			end
 		else 
 			output :error => "Couldn\'t find record with ID=#{params[:id]}"
