@@ -22,7 +22,7 @@ class CreateDataTables < ActiveRecord::Migration
       t.timestamps
     end
 		
-		create_table :persons do |t| # kein data_ prefix weil personen nur über das unternehmen gefunden werden sollen/können
+		create_table :people do |t| # kein data_ prefix weil personen nur über das unternehmen gefunden werden sollen/können
 			t.references	:company
 			t.string			:first_name
 			t.string			:last_name

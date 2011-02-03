@@ -3,8 +3,6 @@ config = YAML.load_file('database.yml')
 
 #code borrowed from here: https://github.com/rails/rails/blob/master/activerecord/lib/active_record/railties/databases.rake
 
-#TODO: add seeding / add seed data
-
 namespace :db do
 	desc "create your database"
   task :create do
@@ -37,6 +35,11 @@ namespace :db do
       'db/migrate', 
       ENV["VERSION"] ? ENV["VERSION"].to_i : nil
     )
+
+		require 'active_record/schema_dumper'
+    File.open("db/schema.rb", "w") do |file|
+      ActiveRecord::SchemaDumper.dump(ActiveRecord::Base.connection, file)
+    end
   end
 
   desc 'Drops the database'
@@ -56,21 +59,41 @@ namespace :db do
   desc 'Resets your database using your migrations for the current environment (drop -> create -> migrate)'
   task :reset => ["db:drop", "db:create", "db:migrate"]
 
-    desc 'Runs the "up" for a given migration VERSION.'
-    task :up do
-      version = ENV["VERSION"] ? ENV["VERSION"].to_i : nil
-      raise "VERSION is required" unless version
-			ActiveRecord::Base.establish_connection(config)
-      ActiveRecord::Migrator.run(:up, "db/migrate/", version)
-    end
+  desc 'Runs the "up" for a given migration VERSION.'
+  task :up do
+    version = ENV["VERSION"] ? ENV["VERSION"].to_i : nil
+    raise "VERSION is required" unless version
+		ActiveRecord::Base.establish_connection(config)
+    ActiveRecord::Migrator.run(:up, "db/migrate/", version)
 
-    desc 'Runs the "down" for a given migration VERSION.'
-    task :down do
-      version = ENV["VERSION"] ? ENV["VERSION"].to_i : nil
-      raise "VERSION is required" unless version
-			ActiveRecord::Base.establish_connection(config)
-      ActiveRecord::Migrator.run(:down, "db/migrate/", version)
+		require 'active_record/schema_dumper'
+    File.open("db/schema.rb", "w") do |file|
+      ActiveRecord::SchemaDumper.dump(ActiveRecord::Base.connection, file)
     end
+  end
+
+  desc 'Runs the "down" for a given migration VERSION.'
+  task :down do
+    version = ENV["VERSION"] ? ENV["VERSION"].to_i : nil
+    raise "VERSION is required" unless version
+		ActiveRecord::Base.establish_connection(config)
+    ActiveRecord::Migrator.run(:down, "db/migrate/", version)
+
+		require 'active_record/schema_dumper'
+    File.open("db/schema.rb", "w") do |file|
+      ActiveRecord::SchemaDumper.dump(ActiveRecord::Base.connection, file)
+    end
+  end
+
+  desc 'Load the seed data from db/seeds.rb'
+  task :seed do
+    seed_file = File.join('db', 'seeds.rb')
+    if File.exist?(seed_file)
+			ActiveRecord::Base.establish_connection(config)
+			require 'lib/models'
+			require seed_file
+		end
+  end
 
   desc "create an ActiveRecord migration in ./db/migrate"
   task :create_migration do
