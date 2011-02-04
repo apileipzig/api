@@ -35,7 +35,7 @@ require 'lib/config'
 
 	#request a list in rest/rails style
 	get '/:source/:model' do
-		logger 'api_key' => params[:api_key], 'source' => params[:source], 'model' => params[:model]
+		logger
 		validate
 		
 		if !params[:pageCount].nil?
@@ -52,7 +52,7 @@ require 'lib/config'
 	post '/:source/:model' do
 		#TODO:
 		#	if user wants to add attributes he is not allowed to, throw an error (is currently just ignored)
-		logger 'api_key' => params[:api_key], 'source' => params[:source], 'model' => params[:model]
+		logger
 		validate
 
 		data = params[:model].singularize.capitalize.constantize.new(create_input_data)
@@ -65,7 +65,7 @@ require 'lib/config'
 
 	#read
 	get '/:source/:model/:id' do
-		logger 'api_key' => params[:api_key], 'source' => params[:source], 'model' => params[:model]
+		logger
 		validate
 		
 		if params[:model].singularize.capitalize.constantize.exists?(params[:id])
@@ -78,7 +78,7 @@ require 'lib/config'
 	#update
 	put '/:source/:model/:id' do
 		#TODO: see "post"
-		logger 'api_key' => params[:api_key], 'source' => params[:source], 'model' => params[:model]
+		logger
 		validate
 		
 		if params[:model].singularize.capitalize.constantize.exists?(params[:id])
@@ -98,7 +98,7 @@ require 'lib/config'
 
 	#delete
 	delete '/:source/:model/:id' do
-		logger 'api_key' => params[:api_key], 'source' => params[:source], 'model' => params[:model]
+		logger
 		validate
 		
 		if params[:model].singularize.capitalize.constantize.delete(params[:id])

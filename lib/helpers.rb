@@ -63,7 +63,8 @@ helpers do
 		if params[:format].nil? or params[:format] != "xml"
 			# JSON
 			content_type 'text/javascript', :charset => 'utf-8'
-			options.to_json().gsub("{","{\n").gsub(",\"",",\n\"").gsub(",{",",\n{").gsub("[","[\n").gsub("]","\n]").gsub("}","\n}").gsub(/\".+\":/,"\t" + '\0')
+			#very ugly
+			JSON.pretty_generate(JSON.parse(options.to_json))
 		else
 			# XML
 			content_type 'text/xml', :charset => 'utf-8'
@@ -94,7 +95,7 @@ helpers do
 		options.merge!('query_string' => request.env['QUERY_STRING'])
 		options.merge!('method' => get_action(request.env['REQUEST_METHOD']))
 		options.merge!('created_at' => Time.now)
-    RequestLog.create(options)
+    RequestLog.create(:api_key => params[:api_key])
   end
 end
 
