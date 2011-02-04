@@ -89,13 +89,8 @@ helpers do
 		data
 	end
 
-  def logger options={}
-		options.merge!('ip' => request.env['REMOTE_ADDR'])
-		options.merge!('request_path' => request.env['REQUEST_PATH'])
-		options.merge!('query_string' => request.env['QUERY_STRING'])
-		options.merge!('method' => get_action(request.env['REQUEST_METHOD']))
-		options.merge!('created_at' => Time.now)
-    RequestLog.create(:api_key => params[:api_key])
+  def logger
+    RequestLog.create(:ip => request.env['REMOTE_ADDR'], :source => params[:source], :model => params[:model], :request_path => request.env['REQUEST_PATH'], :query_string => request.env['QUERY_STRING'], :method => get_action(request.env['REQUEST_METHOD']), :api_key => params[:api_key])
   end
 end
 
