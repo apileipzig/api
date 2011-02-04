@@ -41,9 +41,9 @@ require 'lib/config'
 		if !params[:pageCount].nil?
 			output :pageCount => sprintf("%.f", (params[:source]+'_'+params[:model]).singularize.capitalize.constantize.count / PAGE_SIZE + 0.5)
 		elsif !params[:itemCount].nil?
-			output :itemCount => (params[:source]+'_'+params[:model]).singularize.capitalize.constantize.count
+			output :itemCount => params[:model].singularize.capitalize.constantize.count
 		else
-			output :data => (params[:source]+'_'+params[:model]).singularize.capitalize.constantize.all(:select => only_permitted_columns, :limit => params[:limit], :offset => params[:page])
+			output :data => params[:model].singularize.capitalize.constantize.all(:select => only_permitted_columns, :limit => params[:limit], :offset => params[:page])
 		end
 	end
 
@@ -55,7 +55,7 @@ require 'lib/config'
 		logger 'api_key' => params[:api_key], 'source' => params[:source], 'model' => params[:model]
 		validate
 
-		data = (params[:source]+'_'+params[:model]).singularize.capitalize.constantize.new(create_input_data)
+		data = params[:model].singularize.capitalize.constantize.new(create_input_data)
 		if data.save
 			output :success => "record is saved with ID=#{data.id()}"
 		else
@@ -68,8 +68,8 @@ require 'lib/config'
 		logger 'api_key' => params[:api_key], 'source' => params[:source], 'model' => params[:model]
 		validate
 		
-		if (params[:source]+'_'+params[:model]).singularize.capitalize.constantize.exists?(params[:id])
-			output :model => (params[:source]+'_'+params[:model]).singularize.capitalize.constantize.find(params[:id], :select => only_permitted_columns)
+		if params[:model].singularize.capitalize.constantize.exists?(params[:id])
+			output :model => params[:model].singularize.capitalize.constantize.find(params[:id], :select => only_permitted_columns)
 		else
 			output :error => "Couldn\'t find record with ID=#{params[:id]}"
 		end
@@ -81,8 +81,8 @@ require 'lib/config'
 		logger 'api_key' => params[:api_key], 'source' => params[:source], 'model' => params[:model]
 		validate
 		
-		if (params[:source]+'_'+params[:model]).singularize.capitalize.constantize.exists?(params[:id])
-			data = (params[:source]+'_'+params[:model]).singularize.capitalize.constantize.find(params[:id])
+		if params[:model].singularize.capitalize.constantize.exists?(params[:id])
+			data = params[:model].singularize.capitalize.constantize.find(params[:id])
 			create_input_data.each do |column,value|
 				data[column] = value
 			end
@@ -101,7 +101,7 @@ require 'lib/config'
 		logger 'api_key' => params[:api_key], 'source' => params[:source], 'model' => params[:model]
 		validate
 		
-		if (params[:source]+'_'+params[:model]).singularize.capitalize.constantize.delete(params[:id])
+		if params[:model].singularize.capitalize.constantize.delete(params[:id])
 			output :success => "Deleted record with ID=#{params[:id]}"
 		else
 			output :error => "Couldn\'t find record with ID=#{params[:id]}"

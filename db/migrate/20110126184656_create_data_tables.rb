@@ -24,7 +24,7 @@ class CreateDataTables < ActiveRecord::Migration
     end
 		
 		create_table :mediahandbook_people do |t| # kein data_ prefix weil personen nur über das unternehmen gefunden werden sollen/können
-			t.references	:mediahandbook_company
+			t.references	:company
 			t.string			:first_name
 			t.string			:last_name
 			t.string			:title
@@ -43,14 +43,14 @@ class CreateDataTables < ActiveRecord::Migration
 		end
 
 		create_table :mediahandbook_companies_branches, :id => false do |t|
-			t.references	:mediahandbook_company
-			t.references	:mediahandbook_branch
+			t.references	:company
+			t.references	:branch
 		end	
   end
 
   def self.down
     drop_table	:data_mediahandbook_companies
-		drop_table	:mediahandbook_persons
+		drop_table	:mediahandbook_people
 		drop_table	:data_mediahandbook_branches
 		drop_table	:mediahandbook_companies_branches
   end
