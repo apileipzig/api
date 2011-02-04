@@ -35,7 +35,7 @@ class CreateDataTables < ActiveRecord::Migration
 
 		create_table :data_branches do |t|
 			t.integer			:parent_id
-			t.integer			:cluster_id		#Clustereinteilung der Stadt Leipzig, Medienhandbuch ist imemr cluster_id = 1
+			t.integer			:cluster_id		#Clustereinteilung der Stadt Leipzig, Medienhandbuch ist immer cluster_id = 1
 			t.string			:internal_key	#interner Schlüssel der Stadt Leipzig z.b. A1 oder F5
 			t.string			:name
 			t.string			:description

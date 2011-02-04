@@ -14,7 +14,7 @@ helpers do
 		throw_error 405 unless params[:model].match(/^[A-Za-z0-9]*$/)
 
 		#TODO: connect permissions and user through the models (rails style)
-		@permissions = Permission.find(:all, :joins=> :users, :conditions => {:access => get_action(request.env['REQUEST_METHOD']), :table => params[:model], :users => { :id => @user.id } })
+		@permissions = @user.permissions.where(:access => get_action(request.env['REQUEST_METHOD']), :table => params[:model])
 		throw_error 403 if @permissions.empty?
 
 		throw_error 405 unless params[:id].match(/^[0-9]*$/) unless params[:id].nil?
@@ -59,12 +59,10 @@ helpers do
 	#output data format
 	#TODO: add switch for browsers to display data nice like fb
 	def output options={}
-		puts options.inspect
-		
 		if params[:format].nil? or params[:format] != "xml"
 			# JSON
 			content_type 'text/javascript', :charset => 'utf-8'
-			options.to_json()
+			options.to_json().gsub("{","{\n").gsub(",\"",",\n\"").gsub(",{",",\n{").gsub("[","[\n").gsub("]","\n]").gsub("}","\n}").gsub(/\".+\":/,"\t" + '\0')
 		else
 			# XML
 			content_type 'text/xml', :charset => 'utf-8'
@@ -94,7 +92,8 @@ helpers do
 		options.merge!('request_path' => request.env['REQUEST_PATH'])
 		options.merge!('query_string' => request.env['QUERY_STRING'])
 		options.merge!('method' => get_action(request.env['REQUEST_METHOD']))
-    RequestLog.new(options).save(:validate => false)
+		options.merge!('created_at' => Time.now)
+    RequestLog.create(options)
   end
 end
 
