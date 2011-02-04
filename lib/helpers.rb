@@ -11,10 +11,11 @@ helpers do
 		@user = User.find(:first, :conditions => [ "single_access_token = ?", params[:api_key]])
 		throw_error 401 if @user.nil?
 		
+		throw_error 405 unless params[:source].match(/^[A-Za-z0-9]*$/)
 		throw_error 405 unless params[:model].match(/^[A-Za-z0-9]*$/)
 
 		#TODO: connect permissions and user through the models (rails style)
-		@permissions = @user.permissions.where(:access => get_action(request.env['REQUEST_METHOD']), :table => params[:model])
+		@permissions = @user.permissions.where(:access => get_action(request.env['REQUEST_METHOD']), :source => params[:source], :table => params[:model])
 		throw_error 403 if @permissions.empty?
 
 		throw_error 405 unless params[:id].match(/^[0-9]*$/) unless params[:id].nil?

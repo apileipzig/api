@@ -13,20 +13,20 @@ end
 class RequestLog < ActiveRecord::Base
 end
 
-class Company < ActiveRecord::Base
-	set_table_name "data_companies"
+class Mediahandbook_company < ActiveRecord::Base
+	set_table_name "data_mediahandbook_companies"
 	belongs_to :sub_market, :class_name => "Branch"
 	belongs_to :main_branch, :class_name => "Branch"
 	has_and_belongs_to_many :sub_branches, :class_name => "Branch", :limit => 6
 	#TODO maybe we need a validation for creating 6 sub_branches max
 end
 
-class Branch < ActiveRecord::Base
-	set_table_name "data_branches"
+class Mediahandbook_branch < ActiveRecord::Base
+	set_table_name "data_mediahandbook_branches"
 end
 
-class Person < ActiveRecord::Base
-	belongs_to :company
+class Mediahandbook_person < ActiveRecord::Base
+	belongs_to :mediahandbook_company
 end
 
 class TempSync < ActiveRecord::Base

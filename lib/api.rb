@@ -34,28 +34,28 @@ require 'lib/config'
 	end
 
 	#request a list in rest/rails style
-	get '/:model' do
-		logger 'api_key' => params[:api_key], 'model' => params[:model]
+	get '/:source/:model' do
+		logger 'api_key' => params[:api_key], 'source' => params[:source], 'model' => params[:model]
 		validate
 		
 		if !params[:pageCount].nil?
-			output :pageCount => sprintf("%.f", params[:model].singularize.capitalize.constantize.count / PAGE_SIZE + 0.5)
+			output :pageCount => sprintf("%.f", (params[:source]+'_'+params[:model]).singularize.capitalize.constantize.count / PAGE_SIZE + 0.5)
 		elsif !params[:itemCount].nil?
-			output :itemCount => params[:model].singularize.capitalize.constantize.count
+			output :itemCount => (params[:source]+'_'+params[:model]).singularize.capitalize.constantize.count
 		else
-			output :data => params[:model].singularize.capitalize.constantize.all(:select => only_permitted_columns, :limit => params[:limit], :offset => params[:page])
+			output :data => (params[:source]+'_'+params[:model]).singularize.capitalize.constantize.all(:select => only_permitted_columns, :limit => params[:limit], :offset => params[:page])
 		end
 	end
 
 	#per model requests
 	#create
-	post '/:model' do
+	post '/:source/:model' do
 		#TODO:
 		#	if user wants to add attributes he is not allowed to, throw an error (is currently just ignored)
-		logger 'api_key' => params[:api_key], 'model' => params[:model]
+		logger 'api_key' => params[:api_key], 'source' => params[:source], 'model' => params[:model]
 		validate
 
-		data = params[:model].singularize.capitalize.constantize.new(create_input_data)
+		data = (params[:source]+'_'+params[:model]).singularize.capitalize.constantize.new(create_input_data)
 		if data.save
 			output :success => "record is saved with ID=#{data.id()}"
 		else
@@ -64,25 +64,25 @@ require 'lib/config'
 	end
 
 	#read
-	get '/:model/:id' do
-		logger 'api_key' => params[:api_key], 'model' => params[:model]
+	get '/:source/:model/:id' do
+		logger 'api_key' => params[:api_key], 'source' => params[:source], 'model' => params[:model]
 		validate
 		
-		if params[:model].singularize.capitalize.constantize.exists?(params[:id])
-			output :model => params[:model].singularize.capitalize.constantize.find(params[:id], :select => only_permitted_columns)
+		if (params[:source]+'_'+params[:model]).singularize.capitalize.constantize.exists?(params[:id])
+			output :model => (params[:source]+'_'+params[:model]).singularize.capitalize.constantize.find(params[:id], :select => only_permitted_columns)
 		else
 			output :error => "Couldn\'t find record with ID=#{params[:id]}"
 		end
 	end
 
 	#update
-	put '/:model/:id' do
+	put '/:source/:model/:id' do
 		#TODO: see "post"
-		logger 'api_key' => params[:api_key], 'model' => params[:model]
+		logger 'api_key' => params[:api_key], 'source' => params[:source], 'model' => params[:model]
 		validate
 		
-		if params[:model].singularize.capitalize.constantize.exists?(params[:id])
-			data = params[:model].singularize.capitalize.constantize.find(params[:id])
+		if (params[:source]+'_'+params[:model]).singularize.capitalize.constantize.exists?(params[:id])
+			data = (params[:source]+'_'+params[:model]).singularize.capitalize.constantize.find(params[:id])
 			create_input_data.each do |column,value|
 				data[column] = value
 			end
@@ -97,11 +97,11 @@ require 'lib/config'
 	end
 
 	#delete
-	delete '/:model/:id' do
-		logger 'api_key' => params[:api_key], 'model' => params[:model]
+	delete '/:source/:model/:id' do
+		logger 'api_key' => params[:api_key], 'source' => params[:source], 'model' => params[:model]
 		validate
 		
-		if params[:model].singularize.capitalize.constantize.delete(params[:id])
+		if (params[:source]+'_'+params[:model]).singularize.capitalize.constantize.delete(params[:id])
 			output :success => "Deleted record with ID=#{params[:id]}"
 		else
 			output :error => "Couldn\'t find record with ID=#{params[:id]}"

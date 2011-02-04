@@ -1,9 +1,9 @@
 class CreateDataTables < ActiveRecord::Migration
   def self.up
-    create_table :data_companies do |t|
+    create_table :data_mediahandbook_companies do |t|
 			t.references	:sub_market
 			t.references	:main_branch
-      t.string			:name										# Name der Firma
+			t.string			:name										# Name der Firma
 			t.string			:street									# offizieller Straßenname, "-Straße" ausschreiben!
 			t.integer			:housenumber						# nur EINE Zahl, für alles weitere das Feld hausnummer_zusatz verwenden
 			t.string			:housenumber_additional	# Zusatz zur Hausnummer: z.B. -45, a, Tor B, Gebäude 5, Aufgang G
@@ -20,11 +20,11 @@ class CreateDataTables < ActiveRecord::Migration
 			t.string			:url_primary						# eine primäre Url beginnend mit http://
 			t.string			:url_secondary
 			t.text				:description						# Beschreibung der Unternehmenstätigkeit
-      t.timestamps
+			t.timestamps
     end
 		
-		create_table :people do |t| # kein data_ prefix weil personen nur über das unternehmen gefunden werden sollen/können
-			t.references	:company
+		create_table :mediahandbook_people do |t| # kein data_ prefix weil personen nur über das unternehmen gefunden werden sollen/können
+			t.references	:mediahandbook_company
 			t.string			:first_name
 			t.string			:last_name
 			t.string			:title
@@ -33,7 +33,7 @@ class CreateDataTables < ActiveRecord::Migration
 			t.timestamps
 		end
 
-		create_table :data_branches do |t|
+		create_table :data_mediahandbook_branches do |t|
 			t.integer			:parent_id
 			t.integer			:cluster_id		#Clustereinteilung der Stadt Leipzig, Medienhandbuch ist immer cluster_id = 1
 			t.string			:internal_key	#interner Schlüssel der Stadt Leipzig z.b. A1 oder F5
@@ -42,17 +42,17 @@ class CreateDataTables < ActiveRecord::Migration
 			t.timestamps
 		end
 
-		create_table :companies_branches, :id => false do |t|
-			t.references	:company
-			t.references	:branch
+		create_table :mediahandbook_companies_branches, :id => false do |t|
+			t.references	:mediahandbook_company
+			t.references	:mediahandbook_branch
 		end	
   end
 
   def self.down
-    drop_table	:data_companies
-		drop_table	:persons
-		drop_table	:data_branches
-		drop_table	:companies_branches
+    drop_table	:data_mediahandbook_companies
+		drop_table	:mediahandbook_persons
+		drop_table	:data_mediahandbook_branches
+		drop_table	:mediahandbook_companies_branches
   end
 end
 

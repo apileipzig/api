@@ -4,6 +4,7 @@ class CreateRequestLog < ActiveRecord::Migration
 			t.string		:api_key
 			t.string		:ip						#the ip of the request
 			t.string		:dataset			#the dataset which the request applies to
+			t.string		:source				
 			t.string		:model				#the model which the request applies to
 			t.string		:request_path	#the path of the request
 			t.string		:query_string	#the parameters of the request

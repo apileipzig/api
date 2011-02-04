@@ -12,12 +12,12 @@
 
 ActiveRecord::Schema.define(:version => 20110202105400) do
 
-  create_table "companies_branches", :id => false, :force => true do |t|
+  create_table "mediahandbook_companies_branches", :id => false, :force => true do |t|
     t.integer "company_id"
     t.integer "branch_id"
   end
 
-  create_table "data_branches", :force => true do |t|
+  create_table "data_mediahandbook_branches", :force => true do |t|
     t.integer  "parent_id"
     t.integer  "cluster_id"
     t.string   "internal_key"
@@ -27,7 +27,7 @@ ActiveRecord::Schema.define(:version => 20110202105400) do
     t.datetime "updated_at"
   end
 
-  create_table "data_companies", :force => true do |t|
+  create_table "data_mediahandbook_companies", :force => true do |t|
     t.integer  "sub_market_id"
     t.integer  "main_branch_id"
     t.string   "name"
@@ -51,7 +51,7 @@ ActiveRecord::Schema.define(:version => 20110202105400) do
     t.datetime "updated_at"
   end
 
-  create_table "people", :force => true do |t|
+  create_table "mediahandbook_people", :force => true do |t|
     t.integer  "company_id"
     t.string   "first_name"
     t.string   "last_name"
@@ -66,6 +66,7 @@ ActiveRecord::Schema.define(:version => 20110202105400) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "access"
+    t.string   "source"
     t.string   "table"
     t.string   "column"
   end
