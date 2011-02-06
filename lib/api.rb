@@ -33,13 +33,18 @@ require 'lib/config'
 		"anzahl der datensätze: #{count} <br /><br />letzter datensatz:<br/><br/>id: #{last.id}<br />json: #{last.json}"
 	end
 
+	get '/:source' do
+		#TODO: throw other error her, maybe a help message
+		throw_error 405
+	end
+
 	#request a list in rest/rails style
 	get '/:source/:model' do
 		logger
 		validate
 		
 		if !params[:pageCount].nil?
-			output :pageCount => sprintf("%.f", (params[:source]+'_'+params[:model]).singularize.capitalize.constantize.count / PAGE_SIZE + 0.5)
+			output :pageCount => sprintf("%.f", (params[:model]).singularize.capitalize.constantize.count / PAGE_SIZE + 0.5)
 		elsif !params[:itemCount].nil?
 			output :itemCount => params[:model].singularize.capitalize.constantize.count
 		else

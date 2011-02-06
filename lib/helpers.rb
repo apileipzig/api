@@ -63,8 +63,13 @@ helpers do
 		if params[:format].nil? or params[:format] != "xml"
 			# JSON
 			content_type 'text/javascript', :charset => 'utf-8'
-			#very ugly
-			JSON.pretty_generate(JSON.parse(options.to_json))
+			#use pretty print for more readable output in browsers
+			if request.env['HTTP_USER_AGENT'] =~ /(Firefox|Chrome|Chromium|Safari)/
+				#very ugly
+				JSON.pretty_generate(JSON.parse(options.to_json))
+			else
+				options.to_json
+			end
 		else
 			# XML
 			content_type 'text/xml', :charset => 'utf-8'

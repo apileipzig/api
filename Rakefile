@@ -85,13 +85,15 @@ namespace :db do
     end
   end
 
-  desc 'Load the seed data from db/seeds.rb'
+  desc 'Load the seed data (Specify file with "file=" if no file is specified it will seed from db/seeds.rb)'
   task :seed do
-    seed_file = File.join('db', 'seeds.rb')
+		seed_file = ENV["file"] ? ENV["file"].to_s : File.join('db', 'seeds.rb')
     if File.exist?(seed_file)
 			ActiveRecord::Base.establish_connection(config)
 			require 'lib/models'
 			require seed_file
+		else
+			puts "No file found!"
 		end
   end
 

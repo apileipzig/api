@@ -14,7 +14,7 @@ ActiveRecord::Schema.define(:version => 20110128124107) do
 
   create_table "data_mediahandbook_branches", :force => true do |t|
     t.integer  "parent_id"
-    t.integer  "cluster_id"
+    t.string   "internal_type"
     t.string   "internal_key"
     t.string   "name"
     t.string   "description"
