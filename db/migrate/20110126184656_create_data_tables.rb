@@ -43,7 +43,7 @@ class CreateDataTables < ActiveRecord::Migration
 			t.timestamps
 		end
 
-		create_table :branches_companies, :id => false do |t| #FIXME: need to have this name, because of rails convention, may there is a option for it to change?!
+		create_table :mediahandbook_branches_companies, :id => false do |t|
 			t.references	:company
 			t.references	:branch
 		end	
@@ -53,7 +53,7 @@ class CreateDataTables < ActiveRecord::Migration
     drop_table	:data_mediahandbook_companies
 		drop_table	:mediahandbook_people
 		drop_table	:data_mediahandbook_branches
-		drop_table	:branches_companies
+		drop_table	:mediahandbook_branches_companies
   end
 end
 

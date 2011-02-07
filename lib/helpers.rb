@@ -36,13 +36,14 @@ helpers do
 	end
 
 	#error handling
-	def throw_error code
+	def throw_error code, options={}
 		case code
-			#TODO: add more output information here, maybe a help message
-			when 401: halt code, (output :error => "Authentication failed.")
-			when 403: halt code, (output :error => "No permission(s) to do this.")
 			#TODO: add which parameter is wrong or missing
-			when 405: halt code, (output :error => "wrong parameter format.")
+			when 400: halt code, (output :error => options[:message] ? options[:message] : "wrong parameter format.")
+			#TODO: add more output information here, maybe a help message
+			when 401: halt code, (output :error => options[:message] ? options[:message] : "Authentication failed.")
+			when 404: halt code, (output :error => options[:message] ? options[:message] : "Not found.")
+			when 403: halt code, (output :error => options[:message] ? options[:message] : "No permission(s) to do this.")
 		end
 	end
 
@@ -61,6 +62,7 @@ helpers do
 	#output data format
 	#TODO: add switch for browsers to display data nice like fb
 	def output options={}, show_pages=false
+		output = generate_output_data options
 
 		if(show_pages)
 			#TODO: find protocol (http vs. https)
@@ -72,7 +74,7 @@ helpers do
 			paging['previous'] = sprintf(url,params[:api_key],pr,params[:limit]) if pr >= 0
 			ne = params[:offset] + params[:limit]
 			paging['next'] = sprintf(url,params[:api_key],ne,params[:limit]) if ne < params[:model].singularize.capitalize.constantize.count()
-			options << [:paging => paging]
+			output << [:paging => paging]
 		end
 
 		if params[:format].nil? or params[:format] != "xml"
@@ -81,15 +83,58 @@ helpers do
 			#use pretty print for more readable output in browsers
 			if request.env['HTTP_USER_AGENT'] =~ /(Firefox|Chrome|Chromium|Safari)/
 				#very ugly
-				JSON.pretty_generate(JSON.parse(options.to_json))
+				JSON.pretty_generate(JSON.parse(output.to_json))
 			else
-				options.to_json
+				output.to_json
 			end
 		else
 			# XML
 			content_type 'text/xml', :charset => 'utf-8'
 			options.to_xml(:skip_instruct => true, :skip_types => true)
 		end
+	end
+	
+	def generate_output_data options
+		output = {}
+######## this is generic for selecting everything from all associations
+#		if options[:model]
+#			additional_model_data = {}
+#			options[:model].class.reflect_on_all_associations.map do |mac|
+#				if mac.macro == :has_many or mac.macro == :has_and_belongs_to_many
+#					#TODO: permissions and access restriction for this!
+#					additional_model_data[mac.name] = options[:model].send(mac.name).select("id")
+#				end
+#			end
+#			output = options[:model].attributes
+#			output.merge!(additional_model_data)
+#		end
+########
+######## this is for returning only an array of int's of id's
+		if options[:model]
+			output = options[:model].attributes
+			options[:model].class.reflect_on_all_associations.map do |mac|
+				if mac.macro == :has_many or mac.macro == :has_and_belongs_to_many
+					#TODO: permissions and access restriction for this!
+					output[mac.name] = options[:model].send(mac.name).select("id").map{|m| m.id}
+				end
+			end
+		elsif options[:data]
+########
+			output[:data] = []
+			options[:data].each do |d|
+				dd = {}
+				d.class.reflect_on_all_associations.map do |mac|
+					if mac.macro == :has_many or mac.macro == :has_and_belongs_to_many
+						#TODO: permissions and access restriction for this!
+						dd[mac.name] = d.send(mac.name).select("id").map{|m| m.id}
+					end
+				end
+				output[:data] << d.attributes << dd
+			end
+		elsif options[:error] or options[:success]
+			output = options
+		end
+	output
 	end
 
 	#specify only the colums we have rights to

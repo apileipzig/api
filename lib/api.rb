@@ -58,7 +58,7 @@ require 'lib/config'
 		if data.save
 			output :success => "record is saved with ID=#{data.id()}"
 		else
-			output :error => data.errors
+			throw_error 404, :message => data.errors
 		end
 	end
 
@@ -67,10 +67,10 @@ require 'lib/config'
 		logger
 		validate
 		
-		if params[:model].singularize.capitalize.constantize.exists?(params[:id])
+		begin
 			output :model => params[:model].singularize.capitalize.constantize.find(params[:id], :select => only_permitted_columns)
-		else
-			output :error => "Couldn\'t find record with ID=#{params[:id]}"
+		rescue Exception => e
+			throw_error 404, :message => e.to_s
 		end
 	end
 
@@ -80,7 +80,7 @@ require 'lib/config'
 		logger
 		validate
 		
-		if params[:model].singularize.capitalize.constantize.exists?(params[:id])
+		begin
 			data = params[:model].singularize.capitalize.constantize.find(params[:id])
 			create_input_data.each do |column,value|
 				data[column] = value
@@ -88,10 +88,10 @@ require 'lib/config'
 			if data.save
 				output :success => "record is updated with ID=#{params[:id]}"
 			else
-				output :error => data.errors
+				throw_error 404, :message => data.errors
 			end
-		else 
-			output :error => "Couldn\'t find record with ID=#{params[:id]}"
+		rescue Exception => e
+			throw_error 404, :message => e.to_s
 		end
 	end
 
@@ -100,10 +100,11 @@ require 'lib/config'
 		logger
 		validate
 		
-		if params[:model].singularize.capitalize.constantize.delete(params[:id])
+		begin
+			params[:model].singularize.capitalize.constantize.delete(params[:id])
 			output :success => "Deleted record with ID=#{params[:id]}"
-		else
-			output :error => "Couldn\'t find record with ID=#{params[:id]}"
+		rescue Exception => e
+			throw_error 404, :message => e.to_s
 		end
 	end
 
