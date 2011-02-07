@@ -43,13 +43,7 @@ require 'lib/config'
 		logger
 		validate
 		
-		if !params[:pageCount].nil?
-			output :pageCount => sprintf("%.f", (params[:model]).singularize.capitalize.constantize.count / PAGE_SIZE + 0.5)
-		elsif !params[:itemCount].nil?
-			output :itemCount => params[:model].singularize.capitalize.constantize.count
-		else
-			output :data => params[:model].singularize.capitalize.constantize.all(:select => only_permitted_columns, :limit => params[:limit], :offset => params[:page])
-		end
+		output [:data => params[:model].singularize.capitalize.constantize.all(:select => only_permitted_columns, :limit => params[:limit], :offset => params[:offset])], true
 	end
 
 	#per model requests

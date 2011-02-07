@@ -20,10 +20,10 @@ helpers do
 
 		throw_error 405 unless params[:id].match(/^[0-9]*$/) unless params[:id].nil?
 
-		unless params[:page].nil?
-			throw_error 405 unless params[:page].match(/^[0-9]*$/)
+		unless params[:offset].nil?
+			throw_error 405 unless params[:offset].match(/^[0-9]*$/)
 			params[:limit] = PAGE_SIZE
-			params[:page] = params[:page].to_i * PAGE_SIZE	#first page is 0
+			params[:offset] = params[:offset].to_i #* PAGE_SIZE	#first page is 0
 		else
 			throw_error 405 unless params[:limit].match(/^[0-9]*$/) unless params[:limit].nil?
 			if params[:limit].nil?
@@ -31,6 +31,7 @@ helpers do
 			else
 				params[:limit] = PAGE_SIZE if params[:limit].to_i > PAGE_SIZE
 			end
+			params[:offset] = 0
 		end
 	end
 
@@ -59,7 +60,21 @@ helpers do
 	#output data
 	#output data format
 	#TODO: add switch for browsers to display data nice like fb
-	def output options={}
+	def output options={}, show_pages=false
+
+		if(show_pages)
+			#TODO: find protocol (http vs. https)
+			url = 'http://'+request.env['HTTP_HOST']+request.path+'?api_key=%s&offset=%d&limit=%d'
+			url += 'format='+params[:format] unless params[:format].nil?
+			paging = Hash.new
+			pr = params[:offset] - params[:limit]
+			#TODO: What to do if offset < PAGE_SIZE && offset > 0 ?
+			paging['previous'] = sprintf(url,params[:api_key],pr,params[:limit]) if pr >= 0
+			ne = params[:offset] + params[:limit]
+			paging['next'] = sprintf(url,params[:api_key],ne,params[:limit]) if ne < params[:model].singularize.capitalize.constantize.count()
+			options << [:paging => paging]
+		end
+
 		if params[:format].nil? or params[:format] != "xml"
 			# JSON
 			content_type 'text/javascript', :charset => 'utf-8'
