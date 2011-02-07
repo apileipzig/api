@@ -83,7 +83,8 @@ helpers do
 		@permissions.each do |per|
 			columns += [per.column]
 		end
-		columns
+		#add id to every model
+		columns << "id"
 	end
 
 	def create_input_data
