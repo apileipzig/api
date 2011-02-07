@@ -61,6 +61,26 @@ helpers do
 	#output data format
 	#TODO: add switch for browsers to display data nice like fb
 	def output options={}
+		output = generate_output_data options
+		if params[:format].nil? or params[:format] != "xml"
+			# JSON
+			content_type 'text/javascript', :charset => 'utf-8'
+			#use pretty print for more readable output in browsers
+			if request.env['HTTP_USER_AGENT'] =~ /(Firefox|Chrome|Chromium|Safari)/
+				#very ugly
+				JSON.pretty_generate(JSON.parse(output.to_json))
+			else
+				output.to_json
+			end
+		else
+			# XML
+			content_type 'text/xml', :charset => 'utf-8'
+			options.to_xml(:skip_instruct => true, :skip_types => true)
+		end
+	end
+	
+	def generate_output_data options
+		output = {}
 ######## this is generic for selecting everything from all associations
 #		if options[:model]
 #			additional_model_data = {}
@@ -80,28 +100,26 @@ helpers do
 			options[:model].class.reflect_on_all_associations.map do |mac|
 				if mac.macro == :has_many or mac.macro == :has_and_belongs_to_many
 					#TODO: permissions and access restriction for this!
-					puts options[:model].send(mac.name).select("id").to_a.inspect
 					output[mac.name] = options[:model].send(mac.name).select("id").map{|m| m.id}
 				end
 			end
-		end
+		elsif options[:data]
 ########
-		
-		if params[:format].nil? or params[:format] != "xml"
-			# JSON
-			content_type 'text/javascript', :charset => 'utf-8'
-			#use pretty print for more readable output in browsers
-			if request.env['HTTP_USER_AGENT'] =~ /(Firefox|Chrome|Chromium|Safari)/
-				#very ugly
-				JSON.pretty_generate(JSON.parse(output.to_json))
-			else
-				options.to_json
+			output[:data] = []
+			options[:data].each do |d|
+				dd = {}
+				d.class.reflect_on_all_associations.map do |mac|
+					if mac.macro == :has_many or mac.macro == :has_and_belongs_to_many
+						#TODO: permissions and access restriction for this!
+						dd[mac.name] = d.send(mac.name).select("id").map{|m| m.id}
+					end
+				end
+				output[:data] << d.attributes << dd
 			end
-		else
-			# XML
-			content_type 'text/xml', :charset => 'utf-8'
-			options.to_xml(:skip_instruct => true, :skip_types => true)
+		elsif options[:error] or options[:success]
+			output = options
 		end
+	output
 	end
 
 	#specify only the colums we have rights to
