@@ -43,7 +43,8 @@ require 'lib/config'
 		logger
 		validate
 		
-		output [:data => params[:model].singularize.capitalize.constantize.all(:select => only_permitted_columns, :limit => params[:limit], :offset => params[:offset])], true
+		output :data => params[:model].singularize.capitalize.constantize.all(:select => only_permitted_columns, :limit => params[:limit], :offset => params[:page]), :pagination => true
+
 	end
 
 	#per model requests

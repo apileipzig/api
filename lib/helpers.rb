@@ -61,20 +61,20 @@ helpers do
 	#output data
 	#output data format
 	#TODO: add switch for browsers to display data nice like fb
-	def output options={}, show_pages=false
+	def output options={} #, show_pages=false
 		output = generate_output_data options
 
-		if(show_pages)
-			#TODO: find protocol (http vs. https)
-			url = 'http://'+request.env['HTTP_HOST']+request.path+'?api_key=%s&offset=%d&limit=%d'
+		if(options[:pagination])
+			uri = URI.parse(request.url)
+			url = uri.scheme+'://'+request.env['HTTP_HOST']+request.path+'?api_key=%s&offset=%d&limit=%d'
 			url += 'format='+params[:format] unless params[:format].nil?
 			paging = Hash.new
 			pr = params[:offset] - params[:limit]
 			#TODO: What to do if offset < PAGE_SIZE && offset > 0 ?
-			paging['previous'] = sprintf(url,params[:api_key],pr,params[:limit]) if pr >= 0
+			paging[:previous] = sprintf(url,params[:api_key],pr,params[:limit]) if pr >= 0
 			ne = params[:offset] + params[:limit]
-			paging['next'] = sprintf(url,params[:api_key],ne,params[:limit]) if ne < params[:model].singularize.capitalize.constantize.count()
-			output << [:paging => paging]
+			paging[:next] = sprintf(url,params[:api_key],ne,params[:limit]) if ne < params[:model].singularize.capitalize.constantize.count()
+			output[:paging] = paging
 		end
 
 		if params[:format].nil? or params[:format] != "xml"
