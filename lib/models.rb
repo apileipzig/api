@@ -46,11 +46,11 @@ end
 class Event < ActiveRecord::Base
 	belongs_to :category, :class_name => "Branch"
 	belongs_to :host
-	has_one :venue
+	belongs_to :venue
 end
 
 class Venue < ActiveRecord::Base
-	belongs_to :event
+	has_many :events
 end
 
 class Host < ActiveRecord::Base
