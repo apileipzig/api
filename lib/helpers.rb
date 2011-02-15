@@ -5,41 +5,48 @@ helpers do
 	#TODO: write a method which checks every parameter if it consists only of letters and digits, something like validate_only_aplhanumeric params
 	def validate
 		throw_error 401 if params[:api_key].nil?
-		throw_error 400 unless params[:api_key].match(/^[A-Za-z0-9]*$/)
+		
+		validate_only_alphanumeric
 		
 		#first check if a user exists, if not, forget about the rest of validation!
 		@user = User.find(:first, :conditions => [ "single_access_token = ?", params[:api_key]])
 		throw_error 401 if @user.nil?
 		
-		throw_error 400 unless params[:source].match(/^[A-Za-z0-9]*$/)
-		throw_error 400 unless params[:model].match(/^[A-Za-z0-9]*$/)
-
 		#TODO: connect permissions and user through the models (rails style)
 		@permissions = @user.permissions.where(:access => get_action(request.env['REQUEST_METHOD']), :source => params[:source], :table => params[:model])
 		throw_error 403 if @permissions.empty?
 
-		throw_error 400 unless params[:id].match(/^[0-9]*$/) unless params[:id].nil?
-
 		unless params[:offset].nil?
-			throw_error 400 unless params[:offset].match(/^[0-9]*$/)
 			params[:offset] =  params[:offset].to_i
 		else
 			params[:offset] = 0
 		end
 
 		unless params[:limit].nil?
-			throw_error 400 unless params[:limit].match(/^[0-9]*$/)
 			params[:limit] = params[:limit].to_i
 			params[:limit] = params[:limit] > PAGE_SIZE ? PAGE_SIZE : params[:limit]
 		else
 			params[:limit] = PAGE_SIZE
 		end
 	end
+	
+	#check every parameter if it consists only of alphanumeric chars	
+	def validate_only_alphanumeric
+		bad_params = []
+		params.each do |k,v|
+			#FIXME: for datetime add "-" and ":"
+			if k == 'limit' or k == 'offset'
+				bad_params << k unless v.match(/^\d+$/)
+			else
+				bad_params << k unless v.match(/^\w+$/)
+			end
+		end
+		throw_error 400, :message => "wrong parameter format in #{bad_params.inspect.gsub('"','')}." if bad_params.length > 0
+	end
 
 	#error handling
 	def throw_error code, options={}
 		case code
-			#TODO: add which parameter is wrong or missing
 			when 400: halt code, (output :error => options[:message] ? options[:message] : "wrong parameter format.")
 			#TODO: add more output information here, maybe a help message
 			when 401: halt code, (output :error => options[:message] ? options[:message] : "Authentication failed.")
@@ -59,10 +66,7 @@ helpers do
 	end
 
 	#generate resulting output
-	#output data
-	#output data format
-	#TODO: add switch for browsers to display data nice like fb
-	def output options={} #, show_pages=false
+	def output options={}
 		output = generate_output_data options
 
 		if(options[:pagination])
