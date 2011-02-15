@@ -120,7 +120,8 @@ helpers do
 			options[:model].class.reflect_on_all_associations.map do |mac|
 				if mac.macro == :has_many or mac.macro == :has_and_belongs_to_many
 					#TODO: permissions and access restriction for this!
-					output[mac.name] = options[:model].send(mac.name).select("id").map{|m| m.id}
+					arr = options[:model].send(mac.name).select("id").map{|m| m.id}
+					output[mac.name] = arr if arr.length > 0
 				end
 			end
 		elsif options[:data]
@@ -131,10 +132,11 @@ helpers do
 				d.class.reflect_on_all_associations.map do |mac|
 					if mac.macro == :has_many or mac.macro == :has_and_belongs_to_many
 						#TODO: permissions and access restriction for this!
-						dd[mac.name] = d.send(mac.name).select("id").map{|m| m.id}
+						arr = d.send(mac.name).select("id").map{|m| m.id}
+						dd[mac.name] = arr if arr.length > 0
 					end
 				end
-				output[:data] << d.attributes << dd
+				output[:data] << d.attributes.merge!(dd)
 			end
 		elsif options[:error] or options[:success]
 			output = options
