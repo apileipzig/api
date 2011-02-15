@@ -5,33 +5,34 @@ helpers do
 	#TODO: write a method which checks every parameter if it consists only of letters and digits, something like validate_only_aplhanumeric params
 	def validate
 		throw_error 401 if params[:api_key].nil?
-		throw_error 405 unless params[:api_key].match(/^[A-Za-z0-9]*$/)
+		throw_error 400 unless params[:api_key].match(/^[A-Za-z0-9]*$/)
 		
 		#first check if a user exists, if not, forget about the rest of validation!
 		@user = User.find(:first, :conditions => [ "single_access_token = ?", params[:api_key]])
 		throw_error 401 if @user.nil?
 		
-		throw_error 405 unless params[:source].match(/^[A-Za-z0-9]*$/)
-		throw_error 405 unless params[:model].match(/^[A-Za-z0-9]*$/)
+		throw_error 400 unless params[:source].match(/^[A-Za-z0-9]*$/)
+		throw_error 400 unless params[:model].match(/^[A-Za-z0-9]*$/)
 
 		#TODO: connect permissions and user through the models (rails style)
 		@permissions = @user.permissions.where(:access => get_action(request.env['REQUEST_METHOD']), :source => params[:source], :table => params[:model])
 		throw_error 403 if @permissions.empty?
 
-		throw_error 405 unless params[:id].match(/^[0-9]*$/) unless params[:id].nil?
+		throw_error 400 unless params[:id].match(/^[0-9]*$/) unless params[:id].nil?
 
 		unless params[:offset].nil?
-			throw_error 405 unless params[:offset].match(/^[0-9]*$/)
-			params[:limit] = PAGE_SIZE
-			params[:offset] = params[:offset].to_i #* PAGE_SIZE	#first page is 0
+			throw_error 400 unless params[:offset].match(/^[0-9]*$/)
+			params[:offset] =  params[:offset].to_i
 		else
-			throw_error 405 unless params[:limit].match(/^[0-9]*$/) unless params[:limit].nil?
-			if params[:limit].nil?
-				params[:limit] = PAGE_SIZE
-			else
-				params[:limit] = PAGE_SIZE if params[:limit].to_i > PAGE_SIZE
-			end
 			params[:offset] = 0
+		end
+
+		unless params[:limit].nil?
+			throw_error 400 unless params[:limit].match(/^[0-9]*$/)
+			params[:limit] = params[:limit].to_i
+			params[:limit] = params[:limit] > PAGE_SIZE ? PAGE_SIZE : params[:limit]
+		else
+			params[:limit] = PAGE_SIZE
 		end
 	end
 
@@ -65,15 +66,15 @@ helpers do
 		output = generate_output_data options
 
 		if(options[:pagination])
-			uri = URI.parse(request.url)
-			url = uri.scheme+'://'+request.env['HTTP_HOST']+request.path+'?api_key=%s&offset=%d&limit=%d'
-			url += 'format='+params[:format] unless params[:format].nil?
+			query_string = ""
+			request.env['rack.request.query_hash'].each { |k,v| query_string += "#{k}=#{v}&" unless k == 'limit' or k == 'offset' }	
+			url = request.env['rack.url_scheme'] +'://'+request.env['HTTP_HOST']+request.path+'?'+query_string+'offset=%d&limit=%d'
 			paging = Hash.new
 			pr = params[:offset] - params[:limit]
-			#TODO: What to do if offset < PAGE_SIZE && offset > 0 ?
-			paging[:previous] = sprintf(url,params[:api_key],pr,params[:limit]) if pr >= 0
+			pr = pr > 0 ? pr : 0
+			paging[:previous] = sprintf(url,pr,params[:limit])
 			ne = params[:offset] + params[:limit]
-			paging[:next] = sprintf(url,params[:api_key],ne,params[:limit]) if ne < params[:model].singularize.capitalize.constantize.count()
+			paging[:next] = sprintf(url,ne,params[:limit]) if ne < params[:model].singularize.capitalize.constantize.count()
 			output[:paging] = paging
 		end
 

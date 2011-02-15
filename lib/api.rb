@@ -13,12 +13,12 @@ require 'lib/config'
 
 	get '/' do
 		#TODO: throw other error her, maybe a help message
-		throw_error 405
+		throw_error 400
 	end
 
 	#sync script for data from leipzig.de	
 	get '/sync' do
-		throw_error 405 if params['json'].nil?
+		throw_error 400 if params['json'].nil?
 		if TempSync.create(:json => params['json'])
 			output :success => "record created."
 		else
@@ -33,17 +33,17 @@ require 'lib/config'
 		"anzahl der datensätze: #{count} <br /><br />letzter datensatz:<br/><br/>id: #{last.id}<br />json: #{last.json}"
 	end
 
-	get '/:source' do
+	get '/:source/?' do
 		#TODO: throw other error her, maybe a help message
-		throw_error 405
+		throw_error 400
 	end
 
 	#request a list in rest/rails style
-	get '/:source/:model' do
+	get '/:source/:model/?' do
 		logger
 		validate
 		
-		output :data => params[:model].singularize.capitalize.constantize.all(:select => only_permitted_columns, :limit => params[:limit], :offset => params[:page]), :pagination => true
+		output :data => params[:model].singularize.capitalize.constantize.all(:select => only_permitted_columns, :limit => params[:limit], :offset => params[:offset]), :pagination => true
 
 	end
 
