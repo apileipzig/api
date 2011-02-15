@@ -50,14 +50,12 @@ require 'lib/config'
 	#per model requests
 	#create
 	post '/:source/:model' do
-		#TODO:
-		#	if user wants to add attributes he is not allowed to, throw an error (is currently just ignored)
 		logger
 		validate
 
 		data = params[:model].singularize.capitalize.constantize.new(create_input_data)
 		if data.save
-			output :success => "record is saved with ID=#{data.id()}"
+			output :success => "Record was saved with id = #{data.id()}."
 		else
 			throw_error 404, :message => data.errors
 		end
@@ -87,7 +85,7 @@ require 'lib/config'
 				data[column] = value
 			end
 			if data.save
-				output :success => "record is updated with ID=#{params[:id]}"
+				output :success => "Record was updated with id = #{params[:id]}."
 			else
 				throw_error 404, :message => data.errors
 			end
@@ -103,7 +101,7 @@ require 'lib/config'
 		
 		begin
 			params[:model].singularize.capitalize.constantize.delete(params[:id])
-			output :success => "Deleted record with ID=#{params[:id]}"
+			output :success => "Deleted record with id = #{params[:id]}."
 		rescue Exception => e
 			throw_error 404, :message => e.to_s
 		end

@@ -36,9 +36,9 @@ helpers do
 		params.each do |k,v|
 			#FIXME: for datetime add "-" and ":"
 			if k == 'limit' or k == 'offset'
-				bad_params << k unless v.match(/^\d+$/)
+				bad_params << k unless v.match(/^\d+$/) unless v.nil?
 			else
-				bad_params << k unless v.match(/^\w+$/)
+				bad_params << k unless v.match(/^[^(\:\;\'\"\&\?\$)]+$/) unless v.nil?
 			end
 		end
 		throw_error 400, :message => "wrong parameter format in #{bad_params.inspect.gsub('"','')}." if bad_params.length > 0
@@ -90,7 +90,7 @@ helpers do
 				#very ugly
 				JSON.pretty_generate(JSON.parse(output.to_json))
 			else
-				output.to_json
+				output.to_json + "\n"
 			end
 		else
 			# XML
@@ -157,7 +157,8 @@ helpers do
 	def create_input_data
 		data = Hash.new()
 		@permissions.each do |per|
-			data[per.column] = params[per.column] unless params[per.column].nil?
+			c = per.column.to_sym
+			data[c] = params[c] unless params[c].nil?
 		end
 		data
 	end
