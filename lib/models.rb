@@ -28,11 +28,14 @@ class Company < ActiveRecord::Base
 	has_many :people
 	#TODO maybe we need a validation for creating 6 sub_branches max
 	#TODO validate capitalizing of city, street, ...
+		
+	validates_presence_of :sub_market_id
+	validates_numericality_of :sub_market_id, :allow_nil => true
+	validate :existence_of_sub_market_id, :allow_nil => true
 	
-	#validate sub_market
-	validates_presence_of :main_branch_id, :name
-	validates_numericality_of :main_branch_id
+	validates_numericality_of :main_branch_id, :allow_nil => true
 	validate :existence_of_main_branch_id
+	validates_presence_of :name
 	validates_uniqueness_of :name
   validates_length_of :name, :street, :housenumber_additional, :city, :maximum => 255
 	validates_format_of :street, :without => /(str|str.)$/i, :message => "is invalid. Please use 'straße' and not 'str' or 'str.'.", :allow_nil => true
@@ -42,9 +45,14 @@ class Company < ActiveRecord::Base
 	validates_format_of :phone_primary, :phone_secondary, :fax_primary, :fax_secondary, :mobile_primary, :mobile_secondary, :with => /^(\+[0-9]+ |0)[1-9]{2,} [0-9]{2,}(\-[0-9]+|)$/, :allow_nil => true
 	validates_format_of :email_primary, :email_secondary, :with => /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/, :allow_nil => true
 	validates_format_of :url_primary, :url_secondary, :with => /^http\:\/\/[a-zA-Z0-9\-\.]+[a-zA-Z0-9\-]+\.[a-zA-Z]{2,3}(\/\S*)?$/, :allow_nil => true
-
+	
 	def existence_of_main_branch_id
-		errors.add(:main_branch_id, "does not exist.") unless Branch.exists?(:id => main_branch_id, :internal_type => 'main_branch')
+		errors.add(:main_branch_id, "does not exist.") unless Branch.exists?(:id => main_branch_id, :internal_type => 'main_branch') unless main_branch_id.nil?
+	end
+	
+	def existence_of_sub_market_id
+		#only check if sub_market is an integer > 0
+		errors.add(:sub_market_id, "does not exist.") unless Branch.exists?(:id => sub_market_id, :internal_type => 'sub_market') unless sub_market_id.to_i == 0
 	end
 end
 

@@ -34,17 +34,23 @@ helpers do
 	#check if parameters for associations are correct, e.g. sub_branches=1,2,3
 	def validate_associations
 		bad_params = []
+		not_existing_assocs = []
 		params[:model].singularize.capitalize.constantize.reflect_on_all_associations.map do |assoc|
 			if assoc.macro == :has_many or assoc.macro == :has_and_belongs_to_many
 				unless params[assoc.name].nil?
 					bad_params << assoc.name.to_s unless params[assoc.name] =~ /^[0-9\,]+$/
 					params[assoc.name].split(",").map do |n|
-							bad_params << assoc.name.to_s if n.to_i == 0
+							if n.to_i == 0
+								bad_params << assoc.name.to_s
+							else
+								not_existing_assocs << assoc.name.to_s + "=" + n unless assoc.class_name.singularize.capitalize.constantize.exists?(n)
+							end
 					end
 				end
-				throw_error 400, :message => "wrong parameter format in #{bad_params.uniq.inspect.gsub('"','')}." if bad_params.length > 0
 			end
 		end
+		throw_error 400, :message => "wrong parameter format in #{bad_params.uniq.inspect.gsub('"','')}." if bad_params.length > 0
+		throw_error 404, :message => "following parameters don't exist: #{not_existing_assocs.uniq.inspect.gsub('"','')}." if not_existing_assocs.length > 0
 	end
 
 	#check every parameter if it consists only of alphanumeric chars	
