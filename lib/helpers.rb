@@ -7,6 +7,7 @@ helpers do
 		throw_error 401 if params[:api_key].nil?
 		
 		validate_only_alphanumeric
+		validate_associations
 		
 		#first check if a user exists, if not, forget about the rest of validation!
 		@user = User.find(:first, :conditions => [ "single_access_token = ?", params[:api_key]])
@@ -29,7 +30,23 @@ helpers do
 			params[:limit] = PAGE_SIZE
 		end
 	end
-	
+
+	#check if parameters for associations are correct, e.g. sub_branches=1,2,3
+	def validate_associations
+		bad_params = []
+		params[:model].singularize.capitalize.constantize.reflect_on_all_associations.map do |assoc|
+			if assoc.macro == :has_many or assoc.macro == :has_and_belongs_to_many
+				unless params[assoc.name].nil?
+					bad_params << assoc.name.to_s unless params[assoc.name] =~ /^[0-9\,]+$/
+					params[assoc.name].split(",").map do |n|
+							bad_params << assoc.name.to_s if n.to_i == 0
+					end
+				end
+				throw_error 400, :message => "wrong parameter format in #{bad_params.uniq.inspect.gsub('"','')}." if bad_params.length > 0
+			end
+		end
+	end
+
 	#check every parameter if it consists only of alphanumeric chars	
 	def validate_only_alphanumeric
 		bad_params = []
@@ -38,7 +55,7 @@ helpers do
 			if k == 'limit' or k == 'offset'
 				bad_params << k unless v.match(/^\d+$/) unless v.nil?
 			else
-				bad_params << k unless v.match(/^[^(\:\;\'\"\&\?\$)]+$/) unless v.nil?
+				bad_params << k unless v.match(/^[^(\;\'\"\&\?\$)]+$/) unless v.nil?
 			end
 		end
 		throw_error 400, :message => "wrong parameter format in #{bad_params.inspect.gsub('"','')}." if bad_params.length > 0
@@ -154,7 +171,7 @@ helpers do
 		columns << "id"
 	end
 
-	def create_input_data
+	def create_only_permitted_data
 		data = Hash.new()
 		@permissions.each do |per|
 			c = per.column.to_sym

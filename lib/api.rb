@@ -53,7 +53,18 @@ require 'lib/config'
 		logger
 		validate
 
-		data = params[:model].singularize.capitalize.constantize.new(create_input_data)
+		data = params[:model].singularize.capitalize.constantize.new(create_only_permitted_data)
+		data.class.reflect_on_all_associations.map do |assoc|
+			if assoc.macro == :has_many or assoc.macro == :has_and_belongs_to_many
+				unless params[assoc.name].nil?
+				assoc_array =[]
+				assoc_array = params[assoc.name].split(",").map{ |n| n.to_i}
+				#next two lines mean for example the following: Company.sub_branch_ids = [1,2,3]
+				m = assoc.name.to_s.singularize + "_ids="
+				data.send m.to_sym, assoc_array
+				end
+			end
+		end
 		if data.save
 			output :success => "Record was saved with id = #{data.id()}."
 		else
