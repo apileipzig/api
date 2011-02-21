@@ -1,4 +1,4 @@
-class TempSync < ActiveRecord::Migration
+class CreateTempSync < ActiveRecord::Migration
   def self.up
 		create_table :temp_syncs do |t|
 			t.text :json
