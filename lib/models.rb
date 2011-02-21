@@ -62,7 +62,7 @@ class Branch < ActiveRecord::Base
 end
 
 class Person < ActiveRecord::Base
-	set_table_name "mediahandbook_people"
+	set_table_name "data_mediahandbook_people"
 	belongs_to :company
 end
 
