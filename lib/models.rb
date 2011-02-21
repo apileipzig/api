@@ -1,7 +1,5 @@
 # encoding: utf-8
 
-#TODO: Don't forget to add useful validation rules for real data tables
-
 ActiveRecord::Base.include_root_in_json = false # removes table names in json
 
 class User < ActiveRecord::Base
@@ -63,14 +61,6 @@ class Branch < ActiveRecord::Base
 	set_table_name "data_mediahandbook_branches"
 	has_and_belongs_to_many :companies, :join_table => "mediahandbook_branches_companies"
 end
-=begin
-			t.references	:company
-			t.string			:first_name
-			t.string			:last_name
-			t.string			:title
-			t.string			:position		# position im unternehmen
-			t.string			:type				# ansprechpartner oder geschäftsführer
-=end
 
 class Person < ActiveRecord::Base
 	set_table_name "data_mediahandbook_people"

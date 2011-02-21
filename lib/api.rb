@@ -44,7 +44,6 @@ require 'lib/config'
 		validate
 		
 		output :data => params[:model].singularize.capitalize.constantize.all(:select => only_permitted_columns, :limit => params[:limit], :offset => params[:offset]), :pagination => true
-
 	end
 
 	#per model requests

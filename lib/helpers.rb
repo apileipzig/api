@@ -4,14 +4,14 @@ helpers do
 	#TODO: validate format
 	#TODO: write a method which checks every parameter if it consists only of letters and digits, something like validate_only_aplhanumeric params
 	def validate
-		throw_error 401 if params[:api_key].nil?
+		throw_error 403 if params[:api_key].nil?
 		
 		validate_only_alphanumeric
 		validate_associations
 		
 		#first check if a user exists, if not, forget about the rest of validation!
 		@user = User.find(:first, :conditions => [ "single_access_token = ?", params[:api_key]])
-		throw_error 401 if @user.nil?
+		throw_error 403 if @user.nil?
 		
 		#TODO: connect permissions and user through the models (rails style)
 		@permissions = @user.permissions.where(:access => get_action(request.env['REQUEST_METHOD']), :source => params[:source], :table => params[:model])
