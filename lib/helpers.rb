@@ -178,11 +178,30 @@ helpers do
 	end
 
 	def create_only_permitted_data
-		data = Hash.new()
-		@permissions.each do |per|
-			c = per.column.to_sym
-			data[c] = params[c] unless params[c].nil?
+		data = {}
+		data_params = {}
+
+		data_params.merge! params
+		
+		#ugly as hell and not agnostic for future parameters, which are not data
+		#but no better idea for now :(
+		data_params.delete("api_key")
+		data_params.delete("model")
+		data_params.delete("source")
+		data_params.delete(:limit)
+		data_params.delete(:offset)
+		data_params.delete("id")
+
+		forbidden_params =[]
+		data_params.each do |k,v|
+			if @permissions.find_by_column(k)
+				data[k] = v
+			else
+				forbidden_params << k
+			end
 		end
+		
+		throw_error 404, :message => "No permission to use parameters #{forbidden_params.inspect.gsub('"','')}." if forbidden_params.length > 0
 		data
 	end
 

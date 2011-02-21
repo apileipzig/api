@@ -65,7 +65,7 @@ require 'lib/config'
 			end
 		end
 		if data.save
-			output :success => "Record was saved with id = #{data.id()}."
+			output :success => "#{params[:model].singularize.capitalize} with id = #{data.id()} was saved."
 		else
 			throw_error 404, :message => data.errors
 		end
@@ -85,17 +85,15 @@ require 'lib/config'
 
 	#update
 	put '/:source/:model/:id' do
-		#TODO: see "post"
 		logger
 		validate
+
+		#TODO: association updates...
 		
 		begin
 			data = params[:model].singularize.capitalize.constantize.find(params[:id])
-			create_input_data.each do |column,value|
-				data[column] = value
-			end
-			if data.save
-				output :success => "Record was updated with id = #{params[:id]}."
+			if data.update_attributes(create_only_permitted_data)
+				output :success => "#{params[:model].singularize.capitalize} with id = #{params[:id]} was updated ."
 			else
 				throw_error 404, :message => data.errors
 			end
@@ -109,9 +107,11 @@ require 'lib/config'
 		logger
 		validate
 		
+		data = params[:model].singularize.capitalize.constantize
+		throw_error 404, :message => "#{params[:model].singularize.capitalize} does not exist." unless data.exists?(params[:id])
 		begin
-			params[:model].singularize.capitalize.constantize.delete(params[:id])
-			output :success => "Deleted record with id = #{params[:id]}."
+			data.delete(params[:id])
+			output :success => "Deleted #{params[:model].singularize.capitalize} with id = #{params[:id]}."
 		rescue Exception => e
 			throw_error 404, :message => e.to_s
 		end
