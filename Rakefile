@@ -91,7 +91,11 @@ namespace :db do
     if File.exist?(seed_file)
 			ActiveRecord::Base.establish_connection(config)
 			require 'lib/models'
+			begin
 			require seed_file
+			rescue Exception => e
+				$stderr.puts e
+			end
 		else
 			puts "No file found!"
 		end

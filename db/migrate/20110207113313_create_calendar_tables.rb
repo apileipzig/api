@@ -2,8 +2,8 @@ class CreateCalendarTables < ActiveRecord::Migration
 	def self.up
 		create_table :data_calendar_events do |t|
 			t.references	:category			# Kategorie des Events (ist sub_market)
-			t.references	:host_id
-			t.references	:venue_id
+			t.references	:host
+			t.references	:venue
 			t.date				:date_from
 			t.time				:time_from
 			t.date				:date_to
@@ -27,11 +27,11 @@ class CreateCalendarTables < ActiveRecord::Migration
 			t.timestamps
 		end
 
-		create_table :calendar_hosts do |t|
+		create_table :data_calendar_hosts do |t|
 			t.string			:first_name
 			t.string			:last_name
 			t.string			:phone					# eine primäre Rufummer nach DIN 5008 (http://de.wikipedia.org/wiki/Rufnummer#Schreibweisen)
-			t.string			:mobile_primary	# siehe phone
+			t.string			:mobile					# siehe phone
 			t.string			:url						# eine primäre Url beginnend mit http://
 			t.timestamps
 		end
@@ -40,7 +40,7 @@ class CreateCalendarTables < ActiveRecord::Migration
 	def self.down
 		drop_table	:data_calendar_events
 		drop_table	:data_calendar_venues
-		drop_table	:calendar_hosts
+		drop_table	:data_calendar_hosts
 	end
 end
 

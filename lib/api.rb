@@ -52,7 +52,7 @@ require 'lib/config'
 	post '/:source/:model' do
 		logger
 		validate
-
+		
 		data = params[:model].singularize.capitalize.constantize.new(create_only_permitted_data)
 		data.class.reflect_on_all_associations.map do |assoc|
 			if assoc.macro == :has_many or assoc.macro == :has_and_belongs_to_many
