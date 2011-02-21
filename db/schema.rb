@@ -92,7 +92,7 @@ ActiveRecord::Schema.define(:version => 20110207113313) do
     t.string   "last_name"
     t.string   "title"
     t.string   "position"
-    t.string   "type"
+    t.string   "occupation"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

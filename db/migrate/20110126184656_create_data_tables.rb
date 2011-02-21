@@ -30,14 +30,14 @@ class CreateDataTables < ActiveRecord::Migration
 			t.string			:last_name
 			t.string			:title
 			t.string			:position		# position im unternehmen
-			t.string			:type				# ansprechpartner oder geschäftsführer
+			t.string			:occupation	# ansprechpartner oder geschäftsführer
 			t.timestamps
 		end
 
 		create_table :data_mediahandbook_branches do |t|
 			t.integer			:parent_id
-			t.string			:internal_type# sub_market / branch / sub_branch / cluster
-			t.string			:internal_key	#interner Schlüssel der Stadt Leipzig z.b. A1 oder F5
+			t.string			:internal_type	# sub_market / branch / sub_branch / cluster
+			t.string			:internal_key		#interner Schlüssel der Stadt Leipzig z.b. A1 oder F5
 			t.string			:name
 			t.string			:description
 			t.timestamps

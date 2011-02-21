@@ -63,10 +63,32 @@ class Branch < ActiveRecord::Base
 	set_table_name "data_mediahandbook_branches"
 	has_and_belongs_to_many :companies, :join_table => "mediahandbook_branches_companies"
 end
+=begin
+			t.references	:company
+			t.string			:first_name
+			t.string			:last_name
+			t.string			:title
+			t.string			:position		# position im unternehmen
+			t.string			:type				# ansprechpartner oder geschäftsführer
+=end
 
 class Person < ActiveRecord::Base
 	set_table_name "data_mediahandbook_people"
 	belongs_to :company
+
+	validates_presence_of :company_id, :first_name, :last_name, :occupation
+	validates_length_of :first_name, :last_name, :type, :maximum => 255
+	validate :type_of_occupation
+	validates_numericality_of :company_id, :allow_nil => true
+	validate :existence_of_company_id, :allow_nil => true
+
+	def existence_of_company_id
+		errors.add(:company_id, "does not exist.") unless Company.exists?(:id => company_id) unless company_id.nil?
+	end
+
+	def type_of_occupation
+		errors.add(:occupation, "must be manager or contact.") unless occupation == 'manager' or occupation == 'contact'
+	end
 end
 
 #########
