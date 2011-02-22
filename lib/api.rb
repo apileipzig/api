@@ -12,8 +12,7 @@ require 'lib/config'
 	set :root, APP_ROOT
 
 	get '/' do
-		#TODO: throw other error her, maybe a help message
-		throw_error 400
+		throw_error 400, :message => "wrong url format."
 	end
 
 	#sync script for data from leipzig.de	
@@ -56,11 +55,11 @@ require 'lib/config'
 		data.class.reflect_on_all_associations.map do |assoc|
 			if assoc.macro == :has_many or assoc.macro == :has_and_belongs_to_many
 				unless params[assoc.name].nil?
-				assoc_array =[]
-				assoc_array = params[assoc.name].split(",").map{ |n| n.to_i}
-				#next two lines mean for example the following: Company.sub_branch_ids = [1,2,3]
-				m = assoc.name.to_s.singularize + "_ids="
-				data.send m.to_sym, assoc_array
+					assoc_array =[]
+					assoc_array = params[assoc.name].split(",").map{ |n| n.to_i}
+					#next two lines mean for example the following: Company.sub_branch_ids = [1,2,3]
+					m = assoc.name.to_s.singularize + "_ids="
+					data.send m.to_sym, assoc_array
 				end
 			end
 		end
@@ -116,4 +115,20 @@ require 'lib/config'
 			throw_error 404, :message => e.to_s
 		end
 	end
+	
+	#methods to catch all other request
+	post '/*' do
+		throw_error 400, :message => "wrong url format."
+	end
 
+	get '/*' do
+		throw_error 400, :message => "wrong url format."
+	end
+
+	put '/*' do
+		throw_error 400, :message => "wrong url format."
+	end
+
+	delete '/*' do
+		throw_error 400, :message => "wrong url format."
+	end
