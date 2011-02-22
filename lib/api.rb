@@ -41,8 +41,17 @@ require 'lib/config'
 	get '/:source/:model/?' do
 		logger
 		validate
+
+		permitted_columns = only_permitted_columns
+		conditions = Array.new
+		if !params[:q].nil?
+			conditions[0] = permitted_columns.map{|k| "#{k} LIKE ?" }.join(" OR ")
+			for i in 1..permitted_columns.length
+				conditions[i] = "%#{params[:q]}%"
+			end
+		end
 		
-		output :data => params[:model].singularize.capitalize.constantize.all(:select => only_permitted_columns, :limit => params[:limit], :offset => params[:offset]), :pagination => true
+		output :data => params[:model].singularize.capitalize.constantize.all(:select => permitted_columns, :conditions=>conditions, :limit => params[:limit], :offset => params[:offset]), :pagination => true
 	end
 
 	#per model requests
