@@ -50,7 +50,7 @@ require 'lib/config'
 	post '/:source/:model' do
 		logger
 		validate
-		
+
 		data = params[:model].singularize.capitalize.constantize.new(create_only_permitted_data)
 		data.class.reflect_on_all_associations.map do |assoc|
 			if assoc.macro == :has_many or assoc.macro == :has_and_belongs_to_many
@@ -63,6 +63,7 @@ require 'lib/config'
 				end
 			end
 		end
+
 		if data.save
 			output :success => "#{params[:model].singularize.capitalize} with id = #{data.id()} was saved."
 		else
@@ -86,11 +87,21 @@ require 'lib/config'
 	put '/:source/:model/:id' do
 		logger
 		validate
-
-		#TODO: association updates...
 		
 		begin
 			data = params[:model].singularize.capitalize.constantize.find(params[:id])
+			data.class.reflect_on_all_associations.map do |assoc|
+				if assoc.macro == :has_many or assoc.macro == :has_and_belongs_to_many
+					unless params[assoc.name].nil?
+						assoc_array =[]
+						assoc_array = params[assoc.name].split(",").map{ |n| n.to_i}
+						#next two lines mean for example the following: Company.sub_branch_ids = [1,2,3]
+						m = assoc.name.to_s.singularize + "_ids="
+						data.send m.to_sym, assoc_array
+					end
+				end
+			end
+
 			if data.update_attributes(create_only_permitted_data)
 				output :success => "#{params[:model].singularize.capitalize} with id = #{params[:id]} was updated."
 			else

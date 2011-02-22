@@ -22,9 +22,9 @@ end
 
 class Company < ActiveRecord::Base
 	set_table_name "data_mediahandbook_companies"
-	belongs_to :sub_market, :class_name => "Branch"
-	belongs_to :main_branch, :class_name => "Branch"
-	has_and_belongs_to_many :sub_branches, :class_name => "Branch", :limit => 6, :join_table => "mediahandbook_branches_companies"
+	belongs_to :sub_market, :class_name => "Branch", :conditions => "internal_type = 'sub_market'"
+	belongs_to :main_branch, :class_name => "Branch", :conditions => "internal_type = 'main_branch'"
+	has_and_belongs_to_many :sub_branches, :class_name => "Branch", :limit => 6, :join_table => "mediahandbook_branches_companies", :conditions => "internal_type = 'sub_branch'"
 	has_many :people
 	#TODO maybe we need a validation for creating 6 sub_branches max
 	#TODO validate capitalizing of city, street, ...

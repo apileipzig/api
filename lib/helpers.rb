@@ -37,12 +37,12 @@ helpers do
 		params[:model].singularize.capitalize.constantize.reflect_on_all_associations.map do |assoc|
 			if assoc.macro == :has_many or assoc.macro == :has_and_belongs_to_many
 				unless params[assoc.name].nil?
-					bad_params << assoc.name.to_s unless params[assoc.name] =~ /^[0-9\,]+$/
+					bad_params << assoc.name.to_s unless params[assoc.name] =~ /^[0-9\,]*$/
 					params[assoc.name].split(",").map do |n|
 							if n.to_i == 0
 								bad_params << assoc.name.to_s
 							else
-								not_existing_assocs << assoc.name.to_s + "=" + n unless assoc.class_name.singularize.capitalize.constantize.exists?(n)
+								not_existing_assocs << assoc.name.to_s + "=" + n unless assoc.class_name.singularize.capitalize.constantize.where(assoc.options[:conditions]).exists?(n)
 							end
 					end
 				end
@@ -56,13 +56,13 @@ helpers do
 	def validate_only_alphanumeric
 		bad_params = []
 		params.each do |k,v|
-			#FIXME: for datetime add "-" and ":"
 			if k == 'limit' or k == 'offset'
 				bad_params << k unless v.match(/^\d+$/) unless v.nil?
 			else
-				bad_params << k unless v.match(/^[^(\;\'\"\&\?\$)]+$/) unless v.nil?
+				bad_params << k unless v.match(/^[^(\-\:\;\'\"\&\?\$)]*$/) unless v.nil?
 			end
 		end
+		
 		throw_error 400, :message => "wrong parameter format in #{bad_params.inspect.gsub('"','')}." if bad_params.length > 0
 	end
 
@@ -210,7 +210,14 @@ helpers do
 				forbidden_params << k
 			end
 		end
-		
+
+		#remove association data
+		params[:model].singularize.capitalize.constantize.reflect_on_all_associations.map do |assoc|
+				if assoc.macro == :has_many or assoc.macro == :has_and_belongs_to_many
+					data.delete(assoc.name.to_s)
+				end
+		end
+
 		throw_error 404, :message => "No permission to use parameters #{forbidden_params.inspect.gsub('"','')}." if forbidden_params.length > 0
 		data
 	end
