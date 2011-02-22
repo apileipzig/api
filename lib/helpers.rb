@@ -13,7 +13,6 @@ helpers do
 		@user = User.find(:first, :conditions => [ "single_access_token = ?", params[:api_key]])
 		throw_error 403 if @user.nil?
 		
-		#TODO: connect permissions and user through the models (rails style)
 		@permissions = @user.permissions.where(:access => get_action(request.env['REQUEST_METHOD']), :source => params[:source], :table => params[:model])
 		throw_error 403 if @permissions.empty?
 
@@ -142,9 +141,11 @@ helpers do
 			output = options[:model].attributes
 			options[:model].class.reflect_on_all_associations.map do |mac|
 				if mac.macro == :has_many or mac.macro == :has_and_belongs_to_many
-					#TODO: permissions and access restriction for this!
-					arr = options[:model].send(mac.name).select("id").map{|m| m.id}
-					output[mac.name] = arr if arr.length > 0
+					if @permissions.exists?(:access => get_action(request.env['REQUEST_METHOD']), :source => params[:source], :table => params[:model], :column => mac.name.to_s)
+						#TODO: permissions and access restriction for this association! (not only displaying id)
+						arr = options[:model].send(mac.name).select("id").map{|m| m.id}
+						output[mac.name] = arr if arr.length > 0
+					end
 				end
 			end
 		elsif options[:data]
@@ -154,9 +155,11 @@ helpers do
 				dd = {}
 				d.class.reflect_on_all_associations.map do |mac|
 					if mac.macro == :has_many or mac.macro == :has_and_belongs_to_many
-						#TODO: permissions and access restriction for this!
-						arr = d.send(mac.name).select("id").map{|m| m.id}
-						dd[mac.name] = arr if arr.length > 0
+						if @permissions.exists?(:access => get_action(request.env['REQUEST_METHOD']), :source => params[:source], :table => params[:model], :column => mac.name.to_s)
+							#TODO: permissions and access restriction for this association! (not only displaying id)
+							arr = d.send(mac.name).select("id").map{|m| m.id}
+							dd[mac.name] = arr if arr.length > 0
+						end
 					end
 				end
 				output[:data] << d.attributes.merge!(dd)
@@ -169,12 +172,19 @@ helpers do
 
 	#specify only the colums we have rights to
 	def only_permitted_columns
-		columns = Array.new()
+		columns = []
 		@permissions.each do |per|
-			columns += [per.column]
+			columns << per.column
 		end
 		#add id to every model
 		columns << "id"
+		#remove association data
+		params[:model].singularize.capitalize.constantize.reflect_on_all_associations.map do |assoc|
+				if assoc.macro == :has_many or assoc.macro == :has_and_belongs_to_many
+					columns.map!{|column| column if column != assoc.name.to_s}
+				end
+		end
+		columns.compact.uniq
 	end
 
 	def create_only_permitted_data
@@ -194,7 +204,7 @@ helpers do
 
 		forbidden_params =[]
 		data_params.each do |k,v|
-			if @permissions.find_by_column(k)
+			if @permissions.exists?(:access => get_action(request.env['REQUEST_METHOD']), :source => params[:source], :table => params[:model], :column => k)
 				data[k] = v
 			else
 				forbidden_params << k
