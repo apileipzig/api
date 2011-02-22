@@ -93,7 +93,7 @@ require 'lib/config'
 		begin
 			data = params[:model].singularize.capitalize.constantize.find(params[:id])
 			if data.update_attributes(create_only_permitted_data)
-				output :success => "#{params[:model].singularize.capitalize} with id = #{params[:id]} was updated ."
+				output :success => "#{params[:model].singularize.capitalize} with id = #{params[:id]} was updated."
 			else
 				throw_error 404, :message => data.errors
 			end

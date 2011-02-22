@@ -10,14 +10,22 @@ namespace :permissions do
 			source_name = table.split('_').second
       table_name = table.split('_').third
       puts "Creating permissions for table #{table_name}"
-      ActiveRecord::Base.connection.columns(table).each do |column|
-        next if exclude_list.include?(column.name)
+			permissions_to_generate = ActiveRecord::Base.connection.columns(table).map!{|column| column.name}
+			
+			table_name.singularize.capitalize.constantize.reflect_on_all_associations.map do |assoc|
+				if assoc.macro == :has_many or assoc.macro == :has_and_belongs_to_many
+					permissions_to_generate << assoc.name.to_s
+				end
+			end
+						
+			permissions_to_generate.each do |column_name|
+        next if exclude_list.include?(column_name)
         %w[create read update delete].each do |access|
-          if Permission.find_by_access_and_table_and_column(access, source_name, table_name, column.name).blank?
-	        Permission.create(:access => access, :source => source_name, :table => table_name, :column => column.name)
-	        puts "Permission #{access} for column #{column.name} in table #{source_name}_#{table_name} created"
+          if Permission.find_by_access_and_source_and_table_and_column(access, source_name, table_name, column_name).blank?
+	        	Permission.create(:access => access, :source => source_name, :table => table_name, :column => column_name)
+	        	puts "Permission #{access} for column #{column_name} in table #{source_name}_#{table_name} created"
 	      else
-	        puts "Permission #{access} for column #{column.name} in table #{source_name}_#{table_name} already exists."	      
+	        	puts "Permission #{access} for column #{column_name} in table #{source_name}_#{table_name} already exists."	      
 	      end    
         end
       end
