@@ -99,7 +99,7 @@ helpers do
 			paging = Hash.new
 			pr = params[:offset] - params[:limit]
 			pr = pr > 0 ? pr : 0
-			paging[:previous] = sprintf(url,pr,params[:limit])
+			paging[:previous] = sprintf(url,pr,params[:limit]) if params[:offset] > 0
 			ne = params[:offset] + params[:limit]
 			paging[:next] = sprintf(url,ne,params[:limit]) if ne < params[:model].singularize.capitalize.constantize.count()
 			output[:paging] = paging
