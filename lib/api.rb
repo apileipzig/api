@@ -54,6 +54,35 @@ require 'lib/config'
 		
 		output :data => params[:model].singularize.capitalize.constantize.all(:select => permitted_columns, :conditions=>conditions, :limit => params[:limit], :offset => params[:offset]), :pagination => true
 	end
+	
+	get '/:source/:model/search/?' do
+		logger
+		validate
+		
+		# 1. search q in all permitted columns
+		permitted_columns = only_permitted_columns
+		conditions = [""]
+		if !params[:q].nil?
+			conditions[0] = "(" + permitted_columns.map{|k| "#{k} LIKE ?" }.join(" OR ") + ")"
+			for i in 1..permitted_columns.length
+				conditions[i] = "%#{params[:q]}%"
+			end
+		end
+		
+		# 2. search other paramters
+		params.each do |k,v|
+			if permitted_columns.include?(k)
+				if(conditions[0].length > 0)
+					conditions[0] << " AND #{k} LIKE ?"
+				else
+					conditions[0] << "#{k} LIKE ?"
+				end
+				conditions.push("%#{v}%")
+			end
+		end
+
+		output :data => params[:model].singularize.capitalize.constantize.all(:select => permitted_columns, :conditions=>conditions, :limit => params[:limit], :offset => params[:offset]), :pagination => true
+	end
 
 	#per model requests
 	#create
