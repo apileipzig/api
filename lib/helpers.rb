@@ -94,7 +94,7 @@ helpers do
 		if(options[:pagination])
 			query_string = ""
 			request.env['rack.request.query_hash'].each { |k,v| query_string += "#{k}=#{v}&" unless k == 'limit' or k == 'offset' }	
-			url = request.env['rack.url_scheme'] +'://'+request.env['HTTP_HOST']+request.path+'?'+query_string+'offset=%d&limit=%d'
+			url = API_URL+params[:source]+'/'+params[:model]+'?'+query_string+'offset=%d&limit=%d'
 			paging = Hash.new
 			pr = params[:offset] - params[:limit]
 			pr = pr > 0 ? pr : 0

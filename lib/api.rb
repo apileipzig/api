@@ -52,7 +52,7 @@ require 'lib/config'
 		# 1. search q in all permitted columns
 		permitted_columns = only_permitted_columns
 		conditions = [""]
-		if !params[:q].nil?
+		if !params[:q].nil? && params[:q].length > 0
 			conditions[0] = "(" + permitted_columns.map{|k| "#{k} LIKE ?" }.join(" OR ") + ")"
 			for i in 1..permitted_columns.length
 				conditions[i] = "%#{params[:q]}%"
@@ -61,7 +61,7 @@ require 'lib/config'
 		
 		# 2. search other paramters
 		params.each do |k,v|
-			if permitted_columns.include?(k)
+			if permitted_columns.include?(k) && v.to_s.length > 0
 				if(conditions[0].length > 0)
 					conditions[0] << " AND #{k} LIKE ?"
 				else
@@ -70,8 +70,13 @@ require 'lib/config'
 				conditions.push("%#{v}%")
 			end
 		end
-
-		output :data => params[:model].singularize.capitalize.constantize.all(:select => permitted_columns, :conditions=>conditions, :limit => params[:limit], :offset => params[:offset]), :pagination => true
+		
+		# no output without parameters, otherwise it would return all datasets
+		if conditions.size > 1
+			output :data => params[:model].singularize.capitalize.constantize.all(:select => permitted_columns, :conditions=>conditions), :pagination => false
+		else
+			output :error => "no search parameters."
+		end
 	end
 
 	#per model requests
