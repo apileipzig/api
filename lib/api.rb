@@ -75,7 +75,7 @@ require 'lib/config'
 		if conditions.size > 1
 			output :data => params[:model].singularize.capitalize.constantize.all(:select => permitted_columns, :conditions=>conditions), :pagination => false
 		else
-			output :error => "Please add search paramters."
+			output :error => "no search parameters."
 		end
 	end
 
