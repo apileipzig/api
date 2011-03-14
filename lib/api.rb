@@ -70,12 +70,8 @@ require 'lib/config'
 				conditions.push("%#{v}%")
 			end
 		end
-		
-		if conditions.size > 1
-			output :data => params[:model].singularize.capitalize.constantize.all(:select => permitted_columns, :conditions=>conditions, :limit => params[:limit], :offset => params[:offset]), :pagination => true
-		else
-			output :error => "Please add search paramters."
-		end
+
+		output :data => params[:model].singularize.capitalize.constantize.all(:select => permitted_columns, :conditions=>conditions, :limit => params[:limit], :offset => params[:offset]), :pagination => true
 	end
 
 	#per model requests
