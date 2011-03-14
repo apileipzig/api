@@ -1,11 +1,11 @@
 config = YAML.load_file('database.yml')
-ActiveRecord::Base.establish_connection(config)
-require 'lib/models'
 
 namespace :permissions do
   desc "Looks up all columns from tables beginning with data_ and creates CRUD Permissions for them"
   task :init do
     exclude_list = ['id', 'created_at', 'updated_at']
+		ActiveRecord::Base.establish_connection(config)
+		require 'lib/models'
     ActiveRecord::Base.connection.tables.select{|t| t =~ /^data_/}.each do |table|
 			source_name = table.split('_').second
       table_name = table.split('_').third
@@ -34,6 +34,8 @@ namespace :permissions do
   
   desc "Renames Permissions for a given table and column preserving the rights given to users"
   task :rename, [:table, :old_name, :new_name] do |t, args|
+		ActiveRecord::Base.establish_connection(config)
+		require 'lib/models'
     unless args.table.blank? || args.old_name.blank? || args.new_name.blank?
       if ActiveRecord::Base.connection.tables.select{|t| t =~ /^data_/}.include?(args.table)
         old_permissions = Permission.find_all_by_table_and_column(args.table.split('_')[1], args.old_name)
@@ -57,6 +59,8 @@ namespace :permissions do
 
   desc "Deletes Permissions for a given table and column."
   task :delete, [:table, :column] do |t, args|
+		ActiveRecord::Base.establish_connection(config)
+		require 'lib/models'
     unless args.table.blank? || args.column.blank?
       if ActiveRecord::Base.connection.tables.select{|t| t =~ /^data_/}.include?(args.table)
         permissions = Permission.find_all_by_table_and_column(args.table.split('_')[1], args.column)

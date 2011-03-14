@@ -59,7 +59,7 @@ helpers do
 			if k == 'limit' or k == 'offset'
 				bad_params << k unless v.match(/^\d+$/) unless v.nil?
 			else
-				bad_params << k unless v.match(/^[^(\-\:\;\'\"\&\?\$)]*$/) unless v.nil?
+				bad_params << k unless v.match(/^[^(\;\'\"\&\?\$)]*$/) unless v.nil?
 			end
 		end
 		
@@ -223,7 +223,12 @@ helpers do
 	end
 
   def logger
-    RequestLog.create(:ip => request.env['REMOTE_ADDR'], :source => params[:source], :model => params[:model], :request_path => request.env['REQUEST_PATH'], :query_string => request.env['QUERY_STRING'], :method => get_action(request.env['REQUEST_METHOD']), :api_key => params[:api_key])
+		unless request.env['HTTP_X_FORWARDED_FOR'].nil?
+			ip = request.env['REMOTE_ADDR'] == "127.0.0.1" ? request.env['HTTP_X_FORWARDED_FOR'] : request.env['REMOTE_ADDR']
+		else
+			ip = request.env['REMOTE_ADDR']
+		end
+    RequestLog.create(:ip => ip, :source => params[:source], :model => params[:model], :request_path => request.env['REQUEST_PATH'], :query_string => request.env['QUERY_STRING'], :method => get_action(request.env['REQUEST_METHOD']), :api_key => params[:api_key])
   end
 end
 

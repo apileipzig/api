@@ -87,7 +87,7 @@ end
 
 class Event < ActiveRecord::Base
 	set_table_name "data_calendar_events"
-	belongs_to :category, :class_name => "Branch"
+	belongs_to :category, :class_name => "Branch", :conditions => "internal_type = 'sub_market'"
 	belongs_to :host
 	belongs_to :venue
 
@@ -103,7 +103,7 @@ class Event < ActiveRecord::Base
 	validates_numericality_of :venue_id, :allow_nil => true
 	validate :existence_of_venue_id, :allow_nil => true
 
-	validates_presence_of :name, :description
+	validates_presence_of :name, :description, :date_from
 	validates_length_of :name, :maximum => 255
 	validates_format_of :date_from, :with => /^(1|2)[0-9]{3}\-(0|1)[0-9]{1}\-[0-3]{1}[0-9]{1}$/
 	validates_format_of :date_to, :with => /^(1|2)[0-9]{3}\-(0|1)[0-9]{1}\-[0-3]{1}[0-9]{1}$/, :allow_nil => true
