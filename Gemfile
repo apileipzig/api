@@ -6,7 +6,7 @@ gem "json", "~> 1.5.1"
 gem "authlogic"
 
 group :development do
-  gem "sqlite3-ruby", "~> 1.3.3"
+  gem "sqlite3-ruby", "~> 1.3.3", :require => "sqlite3"
 end
 
 group :production do
