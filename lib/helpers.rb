@@ -228,7 +228,7 @@ helpers do
 		else
 			ip = request.env['REMOTE_ADDR']
 		end
-    RequestLog.create(:ip => ip, :source => params[:source], :model => params[:model], :request_path => request.env['REQUEST_PATH'], :query_string => request.env['QUERY_STRING'], :method => get_action(request.env['REQUEST_METHOD']), :api_key => params[:api_key])
+    RequestLog.create(:ip => ip, :user_agent => request.env['HTTP_USER_AGENT'], :source => params[:source], :model => params[:model], :request_path => request.env['REQUEST_PATH'], :query_string => request.env['QUERY_STRING'], :method => get_action(request.env['REQUEST_METHOD']), :api_key => params[:api_key])
   end
 end
 
