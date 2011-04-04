@@ -1,6 +1,6 @@
 require 'rubygems'
 require 'bundler'
-Bundler.require(:default)
+Bundler.require()
 
 require 'lib/config'
 

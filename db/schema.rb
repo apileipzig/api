@@ -106,9 +106,9 @@ ActiveRecord::Schema.define(:version => 20110207113313) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "access"
-    t.string   "source"
     t.string   "table"
     t.string   "column"
+    t.string   "source"
   end
 
   create_table "permissions_users", :id => false, :force => true do |t|
