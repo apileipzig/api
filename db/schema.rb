@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110207113313) do
+ActiveRecord::Schema.define(:version => 20110404151851) do
 
   create_table "data_calendar_events", :force => true do |t|
     t.integer  "category_id"
@@ -106,9 +106,9 @@ ActiveRecord::Schema.define(:version => 20110207113313) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "access"
-    t.string   "source"
     t.string   "table"
     t.string   "column"
+    t.string   "source"
   end
 
   create_table "permissions_users", :id => false, :force => true do |t|
@@ -127,6 +127,7 @@ ActiveRecord::Schema.define(:version => 20110207113313) do
     t.string   "query_string"
     t.string   "method"
     t.datetime "created_at"
+    t.string   "user_agent"
   end
 
   create_table "temp_syncs", :force => true do |t|
