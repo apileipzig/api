@@ -25,8 +25,14 @@ namespace :permissions do
           accesses = %w[read]
         end
         accesses.each do |access|
-          if Permission.find_by_access_and_source_and_table_and_column(access, source_name, table_name, column_name).blank? 
-            Permission.create(:access => access, :source => source_name, :table => table_name, :column => column_name)
+          #a little bit ugly how this works with 'delete' :)
+          column_name = nil if access == 'delete'
+          if Permission.find_by_access_and_source_and_table_and_column(access, source_name, table_name, column_name).blank?
+            unless access == 'delete'
+              Permission.create(:access => access, :source => source_name, :table => table_name, :column => column_name)
+            else
+              Permission.create(:access => access, :source => source_name, :table => table_name, :column => nil)
+            end
             puts "Permission #{access} for column #{column_name} in table #{source_name}_#{table_name} created"
 	        else
             puts "Permission #{access} for column #{column_name} in table #{source_name}_#{table_name} already exists."	      
