@@ -42,16 +42,16 @@ namespace :permissions do
 		require 'lib/models'
     unless args.table.blank? || args.old_name.blank? || args.new_name.blank?
       if ActiveRecord::Base.connection.tables.select{|t| t =~ /^data_/}.include?(args.table)
-        old_permissions = Permission.find_all_by_table_and_column(args.table.split('_')[1], args.old_name)
-		unless old_permissions.blank?
-		  old_permissions.each do |permission|
-		    permission.column = args.new_name
-		    permission.save
-		    puts "Renamed #{permission.access} Permission #{args.table} => #{args.old_name} to #{args.table} => #{args.new_name}"
-		  end
-		else
-		  puts "No Permissions with name #{args.old_name} for table #{args.table} found. Try running permissions:init first."
-		end        
+        old_permissions = Permission.find_all_by_source_and_table_and_column(args.table.split('_')[1], args.table.split('_')[2], args.old_name)
+		    unless old_permissions.blank?
+		      old_permissions.each do |permission|
+		        permission.column = args.new_name
+		        permission.save
+		        puts "Renamed #{permission.access} Permission #{args.table} => #{args.old_name} to #{args.table} => #{args.new_name}"
+		      end
+		    else
+		      puts "No Permissions with name #{args.old_name} for table #{args.table} found. Try running permissions:init first."
+		    end        
       else
         puts "Table #{args.table} does not exist!"
       end
