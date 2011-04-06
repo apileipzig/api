@@ -7,7 +7,6 @@ helpers do
 		throw_error 403 if params[:api_key].nil?
 		
 		validate_only_alphanumeric
-		validate_associations
 		
 		#first check if a user exists, if not, forget about the rest of validation!
 		@user = User.find(:first, :conditions => [ "single_access_token = ?", params[:api_key]])
@@ -15,6 +14,8 @@ helpers do
 		
 		@permissions = @user.permissions.where(:access => get_action(request.env['REQUEST_METHOD']), :source => params[:source], :table => params[:model])
 		throw_error 403 if @permissions.empty?
+
+		validate_associations
 
 		unless params[:offset].nil?
 			params[:offset] =  params[:offset].to_i
@@ -48,8 +49,8 @@ helpers do
 				end
 			end
 		end
-		throw_error 400, :message => "wrong parameter format in #{bad_params.uniq.inspect.gsub('"','')}." if bad_params.length > 0
-		throw_error 404, :message => "following parameters don't exist: #{not_existing_assocs.uniq.inspect.gsub('"','')}." if not_existing_assocs.length > 0
+		throw_error 400, :message => "Wrong parameter format in #{bad_params.uniq.inspect.gsub('"','')}." if bad_params.length > 0
+		throw_error 404, :message => "The following parameters don't exist: #{not_existing_assocs.uniq.inspect.gsub('"','')}." if not_existing_assocs.length > 0
 	end
 
 	#check every parameter if it consists only of alphanumeric chars	
@@ -63,13 +64,13 @@ helpers do
 			end
 		end
 		
-		throw_error 400, :message => "wrong parameter format in #{bad_params.inspect.gsub('"','')}." if bad_params.length > 0
+		throw_error 400, :message => "Wrong parameter format in #{bad_params.inspect.gsub('"','')}." if bad_params.length > 0
 	end
 
 	#error handling
 	def throw_error code, options={}
 		case code
-			when 400: halt code, (output :error => options[:message] ? options[:message] : "wrong parameter format.")
+			when 400: halt code, (output :error => options[:message] ? options[:message] : "Wrong parameter format.")
 			#TODO: add more output information here, maybe a help message
 			when 401: halt code, (output :error => options[:message] ? options[:message] : "Authentication failed.")
 			when 404: halt code, (output :error => options[:message] ? options[:message] : "Not found.")

@@ -12,16 +12,16 @@ require 'lib/config'
 	set :root, APP_ROOT
 
 	get '/' do
-		throw_error 400, :message => "wrong url format."
+		throw_error 400, :message => "Wrong url format."
 	end
 
 	#sync script for data from leipzig.de	
 	get '/sync' do
 		throw_error 400 if params['json'].nil?
 		if TempSync.create(:json => params['json'])
-			output :success => "record created."
+			output :success => "Record created."
 		else
-			output :error => "record could not be created."
+			output :error => "Record could not be created."
 		end
 	end
 
@@ -75,7 +75,7 @@ require 'lib/config'
 		if conditions.size > 1
 			output :data => params[:model].singularize.capitalize.constantize.all(:select => permitted_columns, :conditions=>conditions), :pagination => false
 		else
-			output :error => "no search parameters."
+			output :error => "No search parameters."
 		end
 	end
 
@@ -163,17 +163,17 @@ require 'lib/config'
 	
 	#methods to catch all other request
 	post '/*' do
-		throw_error 400, :message => "wrong url format."
+		throw_error 400, :message => "Wrong url format."
 	end
 
 	get '/*' do
-		throw_error 400, :message => "wrong url format."
+		throw_error 400, :message => "Wrong url format."
 	end
 
 	put '/*' do
-		throw_error 400, :message => "wrong url format."
+		throw_error 400, :message => "Wrong url format."
 	end
 
 	delete '/*' do
-		throw_error 400, :message => "wrong url format."
+		throw_error 400, :message => "Wrong url format."
 	end
