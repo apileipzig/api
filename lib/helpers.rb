@@ -101,7 +101,8 @@ helpers do
 			paging[:previous] = sprintf(url,pr,params[:limit]) if params[:offset] > 0
 			ne = params[:offset] + params[:limit]
 			paging[:next] = sprintf(url,ne,params[:limit]) if ne < params[:model].singularize.capitalize.constantize.count()
-			output[:paging] = paging
+      #only add apging to output if there is something to page
+			output[:paging] = paging if paging[:next] or paging[:previous]
 		end
 
 		if params[:format].nil? or params[:format] != "xml"
