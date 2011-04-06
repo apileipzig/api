@@ -11,6 +11,7 @@ group :development do
 end
 
 group :production do
+  gem "daemons", "1.0.10"
   gem "thin"
   gem "mysql", "~> 2.8.1"
 end
