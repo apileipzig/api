@@ -176,8 +176,6 @@ helpers do
 		@permissions.each do |per|
 			columns << per.column
 		end
-		#add id to every model
-		columns << "id"
 		#remove association data
 		params[:model].singularize.capitalize.constantize.reflect_on_all_associations.map do |assoc|
 				if assoc.macro == :has_many or assoc.macro == :has_and_belongs_to_many

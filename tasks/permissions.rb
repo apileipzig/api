@@ -3,7 +3,7 @@ config = YAML.load_file('database.yml')
 namespace :permissions do
   desc "Looks up all columns from tables beginning with data_ and creates CRUD Permissions for them"
   task :init do
-    exclude_list = ['id', 'created_at', 'updated_at']
+    only_readable_list = ['id', 'created_at', 'updated_at']
 		ActiveRecord::Base.establish_connection(config)
 		require 'lib/models'
     ActiveRecord::Base.connection.tables.select{|t| t =~ /^data_/}.each do |table|
@@ -19,14 +19,18 @@ namespace :permissions do
 			end
 						
 			permissions_to_generate.each do |column_name|
-        next if exclude_list.include?(column_name)
-        %w[create read update delete].each do |access|
-          if Permission.find_by_access_and_source_and_table_and_column(access, source_name, table_name, column_name).blank?
-	        	Permission.create(:access => access, :source => source_name, :table => table_name, :column => column_name)
-	        	puts "Permission #{access} for column #{column_name} in table #{source_name}_#{table_name} created"
-	      else
-	        	puts "Permission #{access} for column #{column_name} in table #{source_name}_#{table_name} already exists."	      
-	      end    
+        unless only_readable_list.include?(column_name)
+          accesses =  %w[create read update delete]
+        else
+          accesses = %w[read]
+        end
+        accesses.each do |access|
+          if Permission.find_by_access_and_source_and_table_and_column(access, source_name, table_name, column_name).blank? 
+            Permission.create(:access => access, :source => source_name, :table => table_name, :column => column_name)
+            puts "Permission #{access} for column #{column_name} in table #{source_name}_#{table_name} created"
+	        else
+            puts "Permission #{access} for column #{column_name} in table #{source_name}_#{table_name} already exists."	      
+	        end    
         end
       end
     end
