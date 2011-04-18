@@ -32,6 +32,7 @@ require 'lib/config'
 		logger
 		validate
 		
+    data = params[:model].singularize.capitalize.constantize
 		# 1. search q in all permitted columns
 		permitted_columns = only_permitted_columns
 		conditions = [""]
@@ -45,18 +46,23 @@ require 'lib/config'
 		# 2. search other paramters
 		params.each do |k,v|
 			if permitted_columns.include?(k) && v.to_s.length > 0
+			  comparator = data.columns.map{|c| c if c.name == k and c.type == :integer}.compact[0].nil? ? "LIKE" : "="
 				if(conditions[0].length > 0)
-					conditions[0] << " AND #{k} LIKE ?"
+					conditions[0] << " AND #{k} #{comparator} ?"
 				else
-					conditions[0] << "#{k} LIKE ?"
+					conditions[0] << "#{k} #{comparator} ?"
 				end
-				conditions.push("%#{v}%")
+        if comparator == "="
+				  conditions.push("#{v}")
+        else
+          conditions.push("%#{v}%")
+        end
 			end
 		end
 		
 		# no output without parameters, otherwise it would return all datasets
 		if conditions.size > 1
-			output :data => params[:model].singularize.capitalize.constantize.all(:select => permitted_columns, :conditions=>conditions), :pagination => false
+			output :data => data.all(:select => permitted_columns, :conditions=>conditions), :pagination => false
 		else
 			output :error => "No search parameters."
 		end
