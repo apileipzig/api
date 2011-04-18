@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110406220529) do
+ActiveRecord::Schema.define(:version => 20110416142552) do
 
   create_table "data_calendar_events", :force => true do |t|
     t.integer  "category_id"
@@ -25,6 +25,8 @@ ActiveRecord::Schema.define(:version => 20110406220529) do
     t.string   "url"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.boolean  "public"
+    t.integer  "user_id"
   end
 
   create_table "data_calendar_hosts", :force => true do |t|
