@@ -67,7 +67,11 @@ require 'lib/config'
 		
 		# no output without parameters, otherwise it would return all datasets
 		if conditions.size > 1
-			output :data => data.all(:select => permitted_columns, :conditions=>conditions), :pagination => false
+		  c = {:select => permitted_columns, :conditions=>conditions}
+      count = data.all(c).length
+		  c[:limit] = params[:limit] unless params[:limit].nil?
+      c[:offset] = params[:offset] unless params[:offset].nil?
+			output :data => data.all(c), :pagination => c[:limit] ? true : false, :count => count
 		else
 			output :error => "No search parameters."
 		end

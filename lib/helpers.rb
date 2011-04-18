@@ -88,7 +88,8 @@ helpers do
 		output = generate_output_data options
 
 		if options[:pagination]
-		  count = params[:model].singularize.capitalize.constantize.count
+		  count = options[:count] ? options[:count] : params[:model].singularize.capitalize.constantize.count
+        puts count
       #only add paging if the limit is smaller than the amount of all datarecords
 		  if params[:limit] < count
         output[:paging] = {}
