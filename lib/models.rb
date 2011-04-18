@@ -104,6 +104,10 @@ class Event < ActiveRecord::Base
 	validates_numericality_of :venue_id, :allow_nil => true
 	validate :existence_of_venue_id, :allow_nil => true
 
+	validates_presence_of :user_id
+  validates_numericality_of :user_id, :allow_nil => true
+  validate :existence_of_user_id, :allow_nil => true
+  
 	validates_presence_of :name, :description, :date_from
 	validates_length_of :name, :maximum => 255
 	validates_format_of :date_from, :with => /^(1|2)[0-9]{3}\-(0|1)[0-9]{1}\-[0-3]{1}[0-9]{1}$/
@@ -129,9 +133,13 @@ class Event < ActiveRecord::Base
 		errors.add(:host_id, "does not exist.") unless Host.exists?(:id => host_id) unless host_id.to_i == 0
 	end
 
-	def existence_of_venue_id
-		errors.add(:venue_id, "does not exist.") unless Venue.exists?(:id => venue_id) unless venue_id.to_i == 0
-	end
+  def existence_of_venue_id
+    errors.add(:venue_id, "does not exist.") unless Venue.exists?(:id => venue_id) unless venue_id.to_i == 0
+  end
+
+  def existence_of_user_id
+    errors.add(:user_id, "does not exist.") unless User.exists?(:id => user_id) unless user_id.to_i == 0
+  end
 end
 
 class Venue < ActiveRecord::Base

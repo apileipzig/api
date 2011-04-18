@@ -25,6 +25,8 @@ ActiveRecord::Schema.define(:version => 20110418140934) do
     t.string   "url"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.boolean  "public"
+    t.integer  "user_id"
   end
 
   create_table "data_calendar_hosts", :force => true do |t|
