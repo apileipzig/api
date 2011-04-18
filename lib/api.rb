@@ -89,7 +89,7 @@ require 'lib/config'
 		end
 
 		if data.save
-			output :success => "#{params[:model].singularize.capitalize} with id = #{data.id()} was saved."
+			output :success => {:message => "#{params[:model].singularize.capitalize} was saved with id = #{data.id}.", :id => data.id}
 		else
 			throw_error 404, :message => data.errors
 		end
@@ -127,7 +127,7 @@ require 'lib/config'
 			end
 
 			if data.update_attributes(create_only_permitted_data)
-				output :success => "#{params[:model].singularize.capitalize} with id = #{params[:id]} was updated."
+				output :success => {:message => "#{params[:model].singularize.capitalize} with id = #{params[:id]} was updated.", :id => data.id}
 			else
 				throw_error 404, :message => data.errors
 			end
@@ -145,7 +145,7 @@ require 'lib/config'
 		throw_error 404, :message => "#{params[:model].singularize.capitalize} does not exist." unless data.exists?(params[:id])
 		begin
 			data.delete(params[:id])
-			output :success => "Deleted #{params[:model].singularize.capitalize} with id = #{params[:id]}."
+			output :success => {:message => "Deleted #{params[:model].singularize.capitalize} with id = #{params[:id]}.", :id => params[:id].to_i}
 		rescue Exception => e
 			throw_error 404, :message => e.to_s
 		end
