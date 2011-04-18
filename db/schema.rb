@@ -58,7 +58,7 @@ ActiveRecord::Schema.define(:version => 20110418140934) do
     t.string   "internal_type"
     t.string   "internal_key"
     t.string   "name"
-    t.text     "description",   :limit => 255
+    t.text     "description"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -111,9 +111,9 @@ ActiveRecord::Schema.define(:version => 20110418140934) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "access"
+    t.string   "source"
     t.string   "table"
     t.string   "column"
-    t.string   "source"
   end
 
   create_table "permissions_users", :id => false, :force => true do |t|
@@ -126,13 +126,13 @@ ActiveRecord::Schema.define(:version => 20110418140934) do
   create_table "request_logs", :force => true do |t|
     t.string   "api_key"
     t.string   "ip"
+    t.string   "user_agent"
     t.string   "source"
     t.string   "model"
     t.string   "request_path"
     t.string   "query_string"
     t.string   "method"
     t.datetime "created_at"
-    t.string   "user_agent"
   end
 
   create_table "temp_syncs", :force => true do |t|

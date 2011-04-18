@@ -4,6 +4,7 @@ gem "sinatra", "~> 1.1.0"
 gem "activerecord", "~> 3.0.0", :require => "active_record"
 gem "json", "~> 1.5.1"
 gem "authlogic"
+gem "rake"
 
 group :development do
   gem "shotgun"
