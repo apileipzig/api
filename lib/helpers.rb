@@ -22,18 +22,8 @@ helpers do
 
 		validate_associations
 
-		unless params[:offset].nil?
-			params[:offset] =  params[:offset].to_i
-		else
-			params[:offset] = 0
-		end
-
-		unless params[:limit].nil?
-			params[:limit] = params[:limit].to_i
-			params[:limit] = params[:limit] > PAGE_SIZE ? PAGE_SIZE : params[:limit]
-		else
-			params[:limit] = PAGE_SIZE
-		end
+		params[:offset] =  params[:offset].to_i unless params[:offset].nil?
+		params[:limit] = params[:limit].to_i unless params[:limit].nil?
 	end
 
 	#check if parameters for associations are correct, e.g. sub_branches=1,2,3
@@ -97,18 +87,30 @@ helpers do
 	def output options={}
 		output = generate_output_data options
 
-		if(options[:pagination])
-			query_string = ""
-			request.env['rack.request.query_hash'].each { |k,v| query_string += "#{k}=#{v}&" unless k == 'limit' or k == 'offset' }	
-			url = API_URL+params[:source]+'/'+params[:model]+'?'+query_string+'offset=%d&limit=%d'
-			paging = Hash.new
-			pr = params[:offset] - params[:limit]
-			pr = pr > 0 ? pr : 0
-			paging[:previous] = sprintf(url,pr,params[:limit]) if params[:offset] > 0
-			ne = params[:offset] + params[:limit]
-			paging[:next] = sprintf(url,ne,params[:limit]) if ne < params[:model].singularize.capitalize.constantize.count()
-      #only add apging to output if there is something to page
-			output[:paging] = paging if paging[:next] or paging[:previous]
+		if options[:pagination]
+		  count = params[:model].singularize.capitalize.constantize.count
+      #only add paging if the limit is smaller than the amount of all datarecords
+		  if params[:limit] < count
+        output[:paging] = {}
+        params[:offset] = 0 if params[:offset].nil?
+			  query_string = ""
+			  request.env['rack.request.query_hash'].each { |k,v| query_string += "#{k}=#{v}&" unless k == 'offset' }	
+			  url = API_URL+params[:source]+'/'+params[:model]+'?'+query_string
+        
+			  #only next if limit+offset < count
+        ne = params[:offset] + params[:limit]
+			  output[:paging][:next] = url+'offset='+ne.to_s unless ne > count
+        
+        #only previous if offset > 0
+        if params[:offset] > 0
+          pr = params[:offset] - params[:limit]
+          if pr <= 0
+            output[:paging][:previous] = url.chop!
+          else
+            output[:paging][:previous] = url+'offset='+pr.to_s
+          end
+        end
+      end
 		end
 
 		if params[:format].nil? or params[:format] != "xml"

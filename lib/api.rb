@@ -25,7 +25,12 @@ require 'lib/config'
 		logger
 		validate
 		
-		output :data => params[:model].singularize.capitalize.constantize.all(:select => only_permitted_columns, :limit => params[:limit], :offset => params[:offset]), :pagination => true
+    conditions = {:select => only_permitted_columns}
+    #only set limit and offset explicit
+    conditions[:limit] = params[:limit] unless params[:limit].nil?
+    conditions[:offset] = params[:offset] unless params[:offset].nil?
+    #only set pagination if limit is set
+		output :data => params[:model].singularize.capitalize.constantize.all(conditions), :pagination => conditions[:limit] ? true : false
 	end
 
   get '/:source/:model/search/?' do
