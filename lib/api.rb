@@ -15,23 +15,6 @@ require 'lib/config'
 		throw_error 400, :message => "Wrong url format."
 	end
 
-	#sync script for data from leipzig.de	
-	get '/sync' do
-		throw_error 400 if params['json'].nil?
-		if TempSync.create(:json => params['json'])
-			output :success => "Record created."
-		else
-			output :error => "Record could not be created."
-		end
-	end
-
-	#temp read
-	get '/sync_read' do
-		count = TempSync.all.length
-		last = TempSync.last
-		"anzahl der datensätze: #{count} <br /><br />letzter datensatz:<br/><br/>id: #{last.id}<br />json: #{last.json}"
-	end
-
 	get '/:source/?' do
 		#TODO: throw other error her, maybe a help message
 		throw_error 400
@@ -44,8 +27,8 @@ require 'lib/config'
 		
 		output :data => params[:model].singularize.capitalize.constantize.all(:select => only_permitted_columns, :limit => params[:limit], :offset => params[:offset]), :pagination => true
 	end
-	
-	get '/:source/:model/search/?' do
+
+  get '/:source/:model/search/?' do
 		logger
 		validate
 		
@@ -78,6 +61,13 @@ require 'lib/config'
 			output :error => "No search parameters."
 		end
 	end
+
+  get '/:source/:model/count/?' do
+		logger
+		validate
+    puts params[:model].singularize.capitalize.constantize.count
+    output :count => params[:model].singularize.capitalize.constantize.count
+  end
 
 	#per model requests
 	#create
@@ -160,7 +150,7 @@ require 'lib/config'
 			throw_error 404, :message => e.to_s
 		end
 	end
-	
+
 	#methods to catch all other request
 	post '/*' do
 		throw_error 400, :message => "Wrong url format."

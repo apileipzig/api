@@ -166,7 +166,7 @@ helpers do
 				end
 				output[:data] << d.attributes.merge!(dd)
 			end
-		elsif options[:error] or options[:success]
+    else #if it's something else, just push it to the output
 			output = options
 		end
 	output

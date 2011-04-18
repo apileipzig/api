@@ -20,15 +20,15 @@ namespace :permissions do
 						
 			permissions_to_generate.each do |column_name|
         unless only_readable_list.include?(column_name)
-          accesses =  %w[create read update delete]
+          accesses =  %w[create read update delete count]
         else
           accesses = %w[read]
         end
         accesses.each do |access|
           #a little bit ugly how this works with 'delete' :)
-          column_name = nil if access == 'delete'
+          column_name = nil if access == 'delete' or access == 'count'
           if Permission.find_by_access_and_source_and_table_and_column(access, source_name, table_name, column_name).blank?
-            unless access == 'delete'
+            unless access == 'delete' or access == 'count'
               Permission.create(:access => access, :source => source_name, :table => table_name, :column => column_name)
             else
               Permission.create(:access => access, :source => source_name, :table => table_name, :column => nil)
