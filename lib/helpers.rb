@@ -1,9 +1,9 @@
 helpers do
 	#validating every request
 	#TODO: validate if model exists (or let the error "No permission(s) to do this." for now)
-	#TODO: validate format
-	#TODO: write a method which checks every parameter if it consists only of letters and digits, something like validate_only_aplhanumeric params
+	
 	def validate
+	  @permissions = []
 		throw_error 403 if params[:api_key].nil?
 		
 		validate_only_alphanumeric
@@ -12,7 +12,12 @@ helpers do
 		@user = User.find(:first, :conditions => [ "single_access_token = ?", params[:api_key]])
 		throw_error 403 if @user.nil?
 		
-		@permissions = @user.permissions.where(:access => get_action(request.env['REQUEST_METHOD']), :source => params[:source], :table => params[:model])
+    if request.env['REQUEST_URI'] =~ /\/count/
+		  @permissions = @user.permissions.where(:access => get_action(request.env['REQUEST_METHOD']), :source => params[:source], :table => params[:model], :access => "count")
+    else
+      @permissions = @user.permissions.where(:access => get_action(request.env['REQUEST_METHOD']), :source => params[:source], :table => params[:model])
+    end
+
 		throw_error 403 if @permissions.empty?
 
 		validate_associations
