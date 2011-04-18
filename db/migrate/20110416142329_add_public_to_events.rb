@@ -1,4 +1,4 @@
-class AddUserToEvents < ActiveRecord::Migration
+class AddPublicToEvents < ActiveRecord::Migration
   def self.up
     add_column :data_calendar_events, :public, :boolean
   end
