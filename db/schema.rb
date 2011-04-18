@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110406220529) do
+ActiveRecord::Schema.define(:version => 20110418140934) do
 
   create_table "data_calendar_events", :force => true do |t|
     t.integer  "category_id"
@@ -81,9 +81,12 @@ ActiveRecord::Schema.define(:version => 20110406220529) do
     t.string   "email_secondary"
     t.string   "url_primary"
     t.string   "url_secondary"
-    t.text     "description"
+    t.text     "main_activity"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.text     "products"
+    t.text     "resources"
+    t.text     "past_customers"
   end
 
   create_table "data_mediahandbook_people", :force => true do |t|
