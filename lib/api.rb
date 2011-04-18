@@ -103,7 +103,7 @@ require 'lib/config'
 		begin
 			output :model => params[:model].singularize.capitalize.constantize.find(params[:id], :select => only_permitted_columns)
 		rescue Exception => e
-			throw_error 404, :message => e.to_s
+			throw_error 404, :message => {:message => e.to_s, :id => params[:id].to_i}
 		end
 	end
 
@@ -132,7 +132,7 @@ require 'lib/config'
 				throw_error 404, :message => data.errors
 			end
 		rescue Exception => e
-			throw_error 404, :message => e.to_s
+			throw_error 404, :message => {:message => e.to_s, :id => params[:id].to_i}
 		end
 	end
 
@@ -141,13 +141,12 @@ require 'lib/config'
 		logger
 		validate
 		
-		data = params[:model].singularize.capitalize.constantize
-		throw_error 404, :message => "#{params[:model].singularize.capitalize} does not exist." unless data.exists?(params[:id])
-		begin
-			data.delete(params[:id])
+    begin
+      data = params[:model].singularize.capitalize.constantize.find(params[:id])
+		  data.destroy
 			output :success => {:message => "Deleted #{params[:model].singularize.capitalize} with id = #{params[:id]}.", :id => params[:id].to_i}
-		rescue Exception => e
-			throw_error 404, :message => e.to_s
+    rescue Exception => e
+			throw_error 404, :message => {:message => e.to_s, :id => params[:id].to_i}
 		end
 	end
 
