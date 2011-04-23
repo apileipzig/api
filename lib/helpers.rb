@@ -89,7 +89,6 @@ helpers do
 
     if options[:pagination]
       count = options[:count] ? options[:count] : params[:model].singularize.capitalize.constantize.count
-        puts count
       #only add paging if the limit is smaller than the amount of all datarecords
       if params[:limit] < count
         output[:paging] = {}

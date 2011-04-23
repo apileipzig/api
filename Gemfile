@@ -1,7 +1,7 @@
 source "http://rubygems.org"
 
-gem "sinatra", "~> 1.1.0"
-gem "activerecord", "~> 3.0.0", :require => "active_record"
+gem "sinatra"
+gem "activerecord", "~> 3.0.6", :require => "active_record"
 gem "json", "~> 1.5.1"
 gem "authlogic"
 gem "rake"
@@ -12,7 +12,6 @@ group :development do
 end
 
 group :production do
-  gem "daemons", "1.0.10"
   gem "thin"
   gem "mysql", "~> 2.8.1"
 end
