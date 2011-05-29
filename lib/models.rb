@@ -208,5 +208,5 @@ class Districtcompany < ActiveRecord::Base
   belongs_to :district, :class_name => "District"
   validates_presence_of :district_id
   validates_numericality_of :district_id
-  validates_numericality_of :companies_total, :agriculture_foresrty_fishery, :mining, :processing_trade, :power_supply, :water_supply_and_waste_management, :building_contruction, :vehicle_maintenance, :traffic_and_warehousing, :hotel_and_restaurant_industry, :information_and_communication, :financial_and_insurance_services, :housing, :scientific_and_technical_services, :other_economic_services, :public_administration, :education, :health_care, :artistry_and_entertainment, :other_services, :private_services, :extraterritorial_organisations, :other, :allow_nil => true, :only_integer => true
+  validates_numericality_of :companies_total, :agriculture_forestry_fishery, :mining, :processing_trade, :power_supply, :water_supply_and_waste_management, :building_contruction, :vehicle_maintenance, :traffic_and_warehousing, :hotel_and_restaurant_industry, :information_and_communication, :financial_and_insurance_services, :housing, :scientific_and_technical_services, :other_economic_services, :public_administration, :education, :health_care, :artistry_and_entertainment, :other_services, :private_services, :extraterritorial_organisations, :other, :allow_nil => true, :only_integer => true
 end
