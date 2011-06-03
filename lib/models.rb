@@ -203,8 +203,8 @@ class Statistic < ActiveRecord::Base
 
 end
 
-class Districtcompany < ActiveRecord::Base
-  set_table_name "data_district_companies"
+class Ihkcompany < ActiveRecord::Base
+  set_table_name "data_district_ihkcompanies"
   belongs_to :district, :class_name => "District"
   validates_presence_of :district_id
   validates_numericality_of :district_id
