@@ -20,4 +20,4 @@ require APP_ROOT + '/lib/models.rb'
 require APP_ROOT + '/lib/helpers.rb'
 
 PAGE_SIZE = 100
-API_URL = 'http://178.77.99.225/api/v1/'
+API_URL = 'http://www.apileipzig.de/api/v1/'
