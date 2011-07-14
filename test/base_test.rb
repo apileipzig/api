@@ -5,7 +5,8 @@ require 'api'
 require 'test/unit'
 require 'assert_json'
 require 'rack/test'
-require 'contest'
+require 'turn'
+require 'shoulda-context'
 
 ENV['RACK_ENV'] = 'test'
 
@@ -25,10 +26,13 @@ class BaseTest < Test::Unit::TestCase
     assert_json(json_string, &block)
   end
 
-  test "GET '/' returns error" do
-    get '/'
-    assert_status 400
-    assert_body { |json| json.element "error", "Wrong url format." }
+  context "GET '/'" do
+    setup { get '/' }
+
+    should "return an error" do
+      assert_status 400
+      assert_body { |json| json.element "error", "Wrong url format." }
+    end
   end
 
 end

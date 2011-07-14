@@ -11,7 +11,8 @@ group :development do
   gem "sqlite3-ruby", "~> 1.3.3", :require => "sqlite3"
   gem "rack-test"
   gem "assert_json"
-  gem "contest"
+  gem "turn"
+  gem "shoulda-context"
 end
 
 group :production do
