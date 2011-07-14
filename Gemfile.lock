@@ -21,6 +21,8 @@ GEM
     json (1.5.1)
     mysql (2.8.1)
     rack (1.2.2)
+    rack-test (0.6.0)
+      rack (>= 1.0)
     rake (0.8.7)
     shotgun (0.9)
       rack (>= 1.0)
@@ -45,6 +47,7 @@ DEPENDENCIES
   authlogic
   json (~> 1.5.1)
   mysql (~> 2.8.1)
+  rack-test
   rake
   shotgun
   sinatra
