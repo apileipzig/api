@@ -12,6 +12,8 @@ GEM
       tzinfo (~> 0.3.23)
     activesupport (3.0.6)
     arel (2.0.9)
+    assert_json (0.0.3)
+      activesupport
     authlogic (2.1.6)
       activesupport
     builder (2.1.2)
@@ -44,6 +46,7 @@ PLATFORMS
 
 DEPENDENCIES
   activerecord (~> 3.0.6)
+  assert_json
   authlogic
   json (~> 1.5.1)
   mysql (~> 2.8.1)
