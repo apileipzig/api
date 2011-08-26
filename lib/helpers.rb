@@ -121,7 +121,7 @@ helpers do
         #very ugly
         JSON.pretty_generate(JSON.parse(output.to_json))
       else
-        output.to_json + "\n"
+        output.to_json
       end
     else
       # XML
