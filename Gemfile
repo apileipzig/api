@@ -14,8 +14,6 @@ group :development, :test do
   gem 'rack-test', :require => "rack/test"
   gem 'chicago', :require => "chicago/riot"
   gem 'pry'
-  gem 'dm-sweatshop'
-  gem 'dm-sqlite-adapter'
   gem 'faker'
 end
 
