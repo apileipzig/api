@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110827130132) do
+ActiveRecord::Schema.define(:version => 20110827145142) do
 
   create_table "data_calendar_events", :force => true do |t|
     t.integer  "category_id"
@@ -363,6 +363,7 @@ ActiveRecord::Schema.define(:version => 20110827130132) do
     t.text     "products"
     t.text     "resources"
     t.text     "past_customers"
+    t.integer  "mkw_branch_id"
   end
 
   create_table "data_mediahandbook_people", :force => true do |t|
