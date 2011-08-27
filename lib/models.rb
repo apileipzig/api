@@ -163,8 +163,14 @@ class Host < ActiveRecord::Base
   has_many :events
   validates_presence_of :first_name, :last_name
   validates_length_of :first_name, :last_name, :maximum => 255
-  validates_format_of :phone, :mobile, :with => /^(\+[0-9]+ |0)[1-9]{2,} [0-9]{2,}(\-[0-9]+|)$/, :allow_nil => true
+  validates_format_of :phone, :mobile, :fax, :with => /^(\+[0-9]+ |0)[1-9]{2,} [0-9]{2,}(\-[0-9]+|)$/, :allow_nil => true
   validates_format_of :url, :with => /^(http|https)\:\/\/[a-zA-Z0-9\-\.]+[a-zA-Z0-9\-]+\.[a-zA-Z]{2,3}(\/\S*)?$/, :allow_nil => true
+  validates_length_of :company, :street, :housenumber_additional, :city, :maximum => 255
+  validates_format_of :street, :without => /(str|str.)$/i, :message => "is invalid. Please use 'straße' and not 'str' or 'str.'.", :allow_nil => true
+  validates_numericality_of :housenumber, :allow_nil => true
+  validates_length_of :postcode, :maximum => 5
+  validates_format_of :postcode, :with => /^[0-9]{5}$/, :allow_nil => true
+  validates_format_of :email, :with => /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/, :allow_nil => true
 end
 
 ##########

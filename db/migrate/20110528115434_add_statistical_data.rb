@@ -233,7 +233,7 @@ class AddStatisticalData < ActiveRecord::Migration
     create_table :data_district_companies do |t|
       t.integer  :district_id
       t.integer  :companies_total
-      t.integer  :agriculture_foresrty_fishery
+      t.integer  :agriculture_forestry_fishery
       t.integer  :mining
       t.integer  :processing_trade
       t.integer  :power_supply
