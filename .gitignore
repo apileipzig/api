@@ -5,3 +5,4 @@ config.yml
 .bundle/
 db/*.sqlite3
 
+.rvmrc
