@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110528115434) do
+ActiveRecord::Schema.define(:version => 20111023132533) do
 
   create_table "data_calendar_events", :force => true do |t|
     t.integer  "category_id"
@@ -27,6 +27,8 @@ ActiveRecord::Schema.define(:version => 20110528115434) do
     t.datetime "updated_at"
     t.boolean  "public"
     t.integer  "user_id"
+    t.string   "image_url"
+    t.string   "document_url"
   end
 
   create_table "data_calendar_hosts", :force => true do |t|
@@ -37,6 +39,15 @@ ActiveRecord::Schema.define(:version => 20110528115434) do
     t.string   "url"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "company"
+    t.string   "street"
+    t.integer  "housenumber"
+    t.string   "housenumber_additional"
+    t.string   "postcode"
+    t.string   "city"
+    t.string   "email"
+    t.string   "fax"
+    t.text     "comment"
   end
 
   create_table "data_calendar_venues", :force => true do |t|
@@ -53,7 +64,14 @@ ActiveRecord::Schema.define(:version => 20110528115434) do
     t.datetime "updated_at"
   end
 
-  create_table "data_district_companies", :force => true do |t|
+  create_table "data_district_districts", :force => true do |t|
+    t.integer  "number"
+    t.string   "name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "data_district_ihkcompanies", :force => true do |t|
     t.integer  "district_id"
     t.integer  "companies_total"
     t.integer  "agriculture_forestry_fishery"
@@ -78,13 +96,6 @@ ActiveRecord::Schema.define(:version => 20110528115434) do
     t.integer  "private_services"
     t.integer  "extraterritorial_organisations"
     t.integer  "other"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "data_district_districts", :force => true do |t|
-    t.integer  "number"
-    t.string   "name"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -302,6 +313,9 @@ ActiveRecord::Schema.define(:version => 20110528115434) do
     t.integer  "citizenship_not_specified"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "religion_protestant"
+    t.integer  "religion_catholic"
+    t.integer  "religion_other_or_none"
   end
 
   create_table "data_district_streets", :force => true do |t|
@@ -351,6 +365,7 @@ ActiveRecord::Schema.define(:version => 20110528115434) do
     t.text     "products"
     t.text     "resources"
     t.text     "past_customers"
+    t.integer  "mkw_branch_id"
   end
 
   create_table "data_mediahandbook_people", :force => true do |t|
