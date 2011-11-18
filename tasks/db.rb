@@ -1,4 +1,5 @@
-config = YAML.load_file('database.yml')
+env    = ENV['RACK_ENV'] || "development"
+config = YAML.load_file('database.yml')[env]
 
 #code borrowed from here: https://github.com/rails/rails/blob/master/activerecord/lib/active_record/railties/databases.rake
 
