@@ -13,6 +13,7 @@ group :development do
   gem "assert_json"
   gem "turn"
   gem "shoulda-context"
+  gem "factory_girl", "~> 2.2.0"
 end
 
 group :production do
