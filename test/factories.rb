@@ -11,4 +11,13 @@ FactoryGirl.define do
     password_confirmation "test"
   end
 
+  factory :permission do
+    # nothing
+  end
+
+  factory :district do
+    sequence(:name)   {|n| "district-#{n}"}
+    sequence(:number)
+  end
+
 end
