@@ -43,4 +43,44 @@ class Test::Unit::TestCase
     Sinatra::Application
   end
 
+
+  #
+  # helper and utility functions for testing
+  #
+
+  # creates and returns permissions of the given access type for all columns of the given model 
+  def create_permissions_for(klass, access)
+    _, source, table = klass.table_name.split("_")
+    klass.column_names.map do |cname|
+      FactoryGirl.create(:permission, :access => access, :source => source, :table => table, :column => cname)
+    end
+  end
+
+  # shortcut to the parsed JSON body of the last_response
+  def last_result
+    JSON.parse(last_response.body)
+  end
+
+  # returns the data portion of the last_result
+  def last_data
+    last_result['data']
+  end
+
+  # returns the current @user or creates one with default values via FactoryGirl
+  def api_user
+    @user ||= FactoryGirl.create(:user)
+  end
+
+  # returns the api_user's api_key
+  def api_key
+    api_user && api_user.single_access_token
+  end
+
+  # override rack-test's get method in order to add some default values
+  def get(url, opts={})
+    opts[:api_key] ||= api_key
+    super(url, opts)
+  end
+
+
 end

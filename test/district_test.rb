@@ -2,17 +2,9 @@ class DistrictTest < Test::Unit::TestCase
 
   context "GET '/districts'" do
     setup do
-      @user = FactoryGirl.create(:user)
-
-      permissions = District.column_names.map do |cname| 
-        FactoryGirl.create(:permission, :access => "read", :table => "districts", :column => cname, :source => "district")
-      end
-
-      @user.permissions = permissions
-
+      api_user.permissions = create_permissions_for(District, :read)
       FactoryGirl.create(:district, :number => 1, :name => "Zentrum")
-
-      get '/district/districts', :api_key => @user.single_access_token
+      get '/district/districts'
     end
 
     should "be successful" do
@@ -20,9 +12,7 @@ class DistrictTest < Test::Unit::TestCase
     end
 
     should "return a list of all districts" do
-      doc = JSON.parse(last_response.body)
-      puts doc.inspect
-      assert_equal 1, doc['data'].size
+      assert_equal 1, last_data.size
     end
   end
 
