@@ -1,3 +1,5 @@
+$:.unshift File.expand_path(File.dirname(__FILE__))
+
 require 'active_record'
 require 'authlogic'
 

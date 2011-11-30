@@ -13,6 +13,7 @@ group :development do
   gem "rack-test"
   gem "assert_json"
   gem "turn"
+  gem "minitest"
   gem "shoulda-context"
   gem "factory_girl", "~> 2.2.0"
   gem "database_cleaner"

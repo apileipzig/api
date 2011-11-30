@@ -1,17 +1,17 @@
 helpers do
   #validating every request
   #TODO: validate if model exists (or let the error "No permission(s) to do this." for now)
-  
+
   def validate
     @permissions = []
     throw_error 403 if params[:api_key].nil?
-    
+
     validate_only_alphanumeric
-    
+
     #first check if a user exists, if not, forget about the rest of validation!
     @user = User.find(:first, :conditions => [ "single_access_token = ?", params[:api_key]])
     throw_error 403 if @user.nil?
-    
+
     if request.env['REQUEST_URI'] =~ /\/count/
       @permissions = @user.permissions.where(:access => get_action(request.env['REQUEST_METHOD']), :source => params[:source], :table => params[:model], :access => "count")
     else
@@ -48,7 +48,7 @@ helpers do
     throw_error 404, :message => "The following parameters don't exist: #{not_existing_assocs.uniq.inspect.gsub('"','')}." if not_existing_assocs.length > 0
   end
 
-  #check every parameter if it consists only of alphanumeric chars  
+  #check every parameter if it consists only of alphanumeric chars
   def validate_only_alphanumeric
     bad_params = []
     params.each do |k,v|
@@ -58,28 +58,28 @@ helpers do
         bad_params << k unless v.match(/^[^(\;\'\"\&\?\$)]*$/) unless v.nil?
       end
     end
-    
+
     throw_error 400, :message => "Wrong parameter format in #{bad_params.inspect.gsub('"','')}." if bad_params.length > 0
   end
 
   #error handling
   def throw_error code, options={}
     case code
-      when 400: halt code, (output :error => options[:message] ? options[:message] : "Wrong parameter format.")
+      when 400 then halt code, (output :error => options[:message] ? options[:message] : "Wrong parameter format.")
       #TODO: add more output information here, maybe a help message
-      when 401: halt code, (output :error => options[:message] ? options[:message] : "Authentication failed.")
-      when 404: halt code, (output :error => options[:message] ? options[:message] : "Not found.")
-      when 403: halt code, (output :error => options[:message] ? options[:message] : "No permission(s) to do this.")
+      when 401 then halt code, (output :error => options[:message] ? options[:message] : "Authentication failed.")
+      when 404 then halt code, (output :error => options[:message] ? options[:message] : "Not found.")
+      when 403 then halt code, (output :error => options[:message] ? options[:message] : "No permission(s) to do this.")
     end
   end
 
   #map request_method to db access names
   def get_action request_method
     case request_method
-      when 'POST': 'create'
-      when 'GET': 'read'
-      when 'PUT': 'update'
-      when 'DELETE': 'delete'
+      when 'POST' then 'create'
+      when 'GET' then 'read'
+      when 'PUT' then 'update'
+      when 'DELETE' then 'delete'
     end
   end
 
@@ -94,13 +94,13 @@ helpers do
         output[:paging] = {}
         params[:offset] = 0 if params[:offset].nil?
         query_string = ""
-        request.env['rack.request.query_hash'].each { |k,v| query_string += "#{k}=#{v}&" unless k == 'offset' }  
+        request.env['rack.request.query_hash'].each { |k,v| query_string += "#{k}=#{v}&" unless k == 'offset' }
         url = API_URL+params[:source]+'/'+params[:model]+'?'+query_string
-        
+
         #only next if limit+offset < count
         ne = params[:offset] + params[:limit]
         output[:paging][:next] = url+'offset='+ne.to_s unless ne > count
-        
+
         #only previous if offset > 0
         if params[:offset] > 0
           pr = params[:offset] - params[:limit]
@@ -121,7 +121,7 @@ helpers do
         #very ugly
         JSON.pretty_generate(JSON.parse(output.to_json))
       else
-        output.to_json + "\n"
+        output.to_json
       end
     else
       # XML
@@ -129,7 +129,7 @@ helpers do
       options.to_xml(:skip_instruct => true, :skip_types => true)
     end
   end
-  
+
   def generate_output_data options
     output = {}
 ######## this is generic for selecting everything from all associations
@@ -199,7 +199,7 @@ helpers do
     data_params = {}
 
     data_params.merge! params
-    
+
     #ugly as hell and not agnostic for future parameters, which are not data
     #but no better idea for now :(
     data_params.delete("api_key")
