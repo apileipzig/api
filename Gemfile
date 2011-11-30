@@ -16,7 +16,6 @@ group :development do
   gem "shoulda-context"
   gem "factory_girl", "~> 2.2.0"
   gem "database_cleaner"
-  gem "test-unit", "~> 2.4.1", :require => "test/unit"
 end
 
 group :production do

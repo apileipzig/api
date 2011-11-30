@@ -16,20 +16,14 @@ require 'factories'
 require 'database_cleaner'
 
 
+DatabaseCleaner.strategy = :transaction
+DatabaseCleaner.clean_with(:truncation)
+
+
 class Test::Unit::TestCase
   include Rack::Test::Methods
   include AssertJson
   include Api::Assertions
-
-  class << self
-    def startup
-      DatabaseCleaner.strategy = :transaction
-      DatabaseCleaner.clean_with(:truncation)
-    end
-
-    def shutdown
-    end
-  end
 
   def setup
     DatabaseCleaner.start
