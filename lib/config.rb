@@ -14,7 +14,9 @@ module ActiveRecord
   end
 end
 
-ActiveRecord::Base.establish_connection(YAML.load_file(APP_ROOT + '/database.yml'))
+db_config = YAML.load_file(APP_ROOT + '/database.yml')[settings.environment.to_s]
+
+ActiveRecord::Base.establish_connection(db_config)
 
 require APP_ROOT + '/lib/models.rb'
 require APP_ROOT + '/lib/helpers.rb'
