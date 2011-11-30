@@ -1,18 +1,27 @@
 class DistrictTest < Test::Unit::TestCase
 
-  context "GET '/districts'" do
-    setup do
-      api_user.permissions = create_permissions_for(District, :read)
-      FactoryGirl.create(:district, :number => 1, :name => "Zentrum")
-      get '/district/districts'
-    end
+  def setup
+    super
+    @source = '/district'
+    api_user.permissions = create_permissions_for(District, :read)
+    FactoryGirl.create(:district, :number => 1, :name => "Zentrum")
+    FactoryGirl.create(:district, :number => 2, :name => "West")
+  end
 
-    should "be successful" do
-      assert_status 200
-    end
+  test :get, '/districts' do
+    assert_status 200
+    assert_equal 2, last_result["data"].size
+  end
 
-    should "return a list of all districts" do
-      assert_equal 1, last_data.size
+  test :get, '/districts/1' do
+    assert_status 200
+    puts last_result.inspect
+    assert_json(last_response.body) do
+      has "id", 1
+      has "number", 1
+      has "name", "Zentrum"
+      has "created_at"
+      has "updated_at"
     end
   end
 
