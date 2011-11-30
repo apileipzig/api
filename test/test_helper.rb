@@ -43,6 +43,17 @@ class Test::Unit::TestCase
     Sinatra::Application
   end
 
+  #
+  # some dslish test stuff
+  #
+
+  def self.test(verb, resource, &block)
+    define_method :"test #{verb.to_s.upcase} to \'#{resource}\'" do
+      send(verb, [@source, resource].join)
+      instance_eval(&block)
+    end
+
+  end
 
   #
   # helper and utility functions for testing
@@ -61,11 +72,6 @@ class Test::Unit::TestCase
     JSON.parse(last_response.body)
   end
 
-  # returns the data portion of the last_result
-  def last_data
-    last_result['data']
-  end
-
   # returns the current @user or creates one with default values via FactoryGirl
   def api_user
     @user ||= FactoryGirl.create(:user)
@@ -81,6 +87,5 @@ class Test::Unit::TestCase
     opts[:api_key] ||= api_key
     super(url, opts)
   end
-
 
 end
