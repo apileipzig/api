@@ -15,7 +15,6 @@ class DistrictTest < Test::Unit::TestCase
 
   test :get, '/districts/1' do
     assert_status 200
-    puts last_result.inspect
     assert_json(last_response.body) do
       has "id", 1
       has "number", 1
