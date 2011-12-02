@@ -11,42 +11,32 @@ GEM
       arel (~> 2.0.2)
       tzinfo (~> 0.3.23)
     activesupport (3.0.6)
+    ansi (1.4.1)
     arel (2.0.9)
+    assert_json (0.1.1)
+      activesupport
     authlogic (2.1.6)
       activesupport
     builder (2.1.2)
-    chicago (0.3.13)
-    coderay (0.9.8)
     daemons (1.1.4)
+    database_cleaner (0.7.0)
     eventmachine (0.12.10)
-    faker (0.9.5)
-      i18n (~> 0.4)
+    factory_girl (2.2.0)
+      activesupport
     i18n (0.5.0)
     json (1.5.1)
-    method_source (0.6.0)
-      ruby_parser (>= 2.0.5)
+    minitest (2.8.1)
     mysql (2.8.1)
-    pry (0.9.3)
-      coderay (>= 0.9.8)
-      method_source (>= 0.6.0)
-      ruby_parser (>= 2.0.5)
-      slop (~> 1.9.0)
     rack (1.2.2)
     rack-test (0.6.1)
       rack (>= 1.0)
     rake (0.8.7)
-    riot (0.12.4)
-      rr
-    rr (1.0.3)
-    ruby_parser (2.2.0)
-      sexp_processor (~> 3.0)
-    sexp_processor (3.0.6)
     shotgun (0.9)
       rack (>= 1.0)
+    shoulda-context (1.0.0)
     sinatra (1.2.3)
       rack (~> 1.1)
       tilt (>= 1.2.2, < 2.0)
-    slop (1.9.1)
     sqlite3 (1.3.3)
     sqlite3-ruby (1.3.3)
       sqlite3 (>= 1.3.3)
@@ -55,6 +45,8 @@ GEM
       eventmachine (>= 0.12.6)
       rack (>= 1.0.0)
     tilt (1.2.2)
+    turn (0.8.3)
+      ansi
     tzinfo (0.3.26)
 
 PLATFORMS
@@ -62,16 +54,18 @@ PLATFORMS
 
 DEPENDENCIES
   activerecord (~> 3.0.6)
+  assert_json
   authlogic
-  chicago
-  faker
+  database_cleaner
+  factory_girl (~> 2.2.0)
   json (~> 1.5.1)
+  minitest
   mysql (~> 2.8.1)
-  pry
   rack-test
   rake
-  riot
   shotgun
+  shoulda-context
   sinatra
   sqlite3-ruby (~> 1.3.3)
   thin
+  turn
