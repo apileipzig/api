@@ -10,11 +10,14 @@ group :development, :test do
   gem "shotgun"
   gem "sqlite3-ruby", "~> 1.3.3", :require => "sqlite3"
 
-  gem 'riot'
-  gem 'rack-test', :require => "rack/test"
-  gem 'chicago', :require => "chicago/riot"
-  gem 'pry'
-  gem 'faker'
+  # test dependencies
+  gem "rack-test"
+  gem "assert_json"
+  gem "turn"
+  gem "minitest"
+  gem "shoulda-context"
+  gem "factory_girl", "~> 2.2.0"
+  gem "database_cleaner"
 end
 
 group :production do

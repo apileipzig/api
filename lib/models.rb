@@ -25,6 +25,7 @@ class Company < ActiveRecord::Base
   set_table_name "data_mediahandbook_companies"
   belongs_to :sub_market, :class_name => "Branch", :conditions => "internal_type = 'sub_market'"
   belongs_to :main_branch, :class_name => "Branch", :conditions => "internal_type = 'main_branch'"
+  belongs_to :mkw_branch, :class_name => "Branch", :conditions => "internal_type = 'mkw_branch'"
   has_and_belongs_to_many :sub_branches, :class_name => "Branch", :limit => 6, :join_table => "mediahandbook_branches_companies", :conditions => "internal_type = 'sub_branch'"
   has_many :people
   #TODO maybe we need a validation for creating 6 sub_branches max
@@ -37,6 +38,9 @@ class Company < ActiveRecord::Base
   
   validates_numericality_of :main_branch_id, :allow_nil => true
   validate :existence_of_main_branch_id
+
+  validates_numericality_of :mkw_branch_id, :allow_nil => true
+  validate :existence_of_mkw_branch_id
   validates_presence_of :name
   validates_uniqueness_of :name
   validates_length_of :name, :street, :housenumber_additional, :city, :maximum => 255
@@ -50,6 +54,10 @@ class Company < ActiveRecord::Base
   
   def existence_of_main_branch_id
     errors.add(:main_branch_id, "does not exist.") unless Branch.exists?(:id => main_branch_id, :internal_type => 'main_branch') unless main_branch_id.nil?
+  end
+  
+  def existence_of_mkw_branch_id
+    errors.add(:mkw_branch_id, "does not exist.") unless Branch.exists?(:id => mkw_branch_id, :internal_type => 'mkw_branch') unless mkw_branch_id.nil?
   end
   
   def existence_of_sub_market_id
@@ -116,6 +124,8 @@ class Event < ActiveRecord::Base
   validate :format_of_time_to, :allow_nil => true
   #TODO: strip html tags and such stuff from description
   validates_format_of :url, :with => /^(http|https)\:\/\/[a-zA-Z0-9\-\.]+[a-zA-Z0-9\-]+\.[a-zA-Z]{2,3}(\/\S*)?$/, :allow_nil => true
+  validates_format_of :image_url, :with => /^(http|https)\:\/\/[a-zA-Z0-9\-\.]+[a-zA-Z0-9\-]+\.[a-zA-Z]{2,3}(\/\S*)?$/, :allow_nil => true
+  validates_format_of :document_url, :with => /^(http|https)\:\/\/[a-zA-Z0-9\-\.]+[a-zA-Z0-9\-]+\.[a-zA-Z]{2,3}(\/\S*)?$/, :allow_nil => true
   
   def format_of_time_from
     errors.add(:time_from, "is invalid.") unless time_from_before_type_cast =~ /^[0-2]{1}[0-9]{1}\:[0-5]{1}[0-9]{1}\:[0-5]{1}[0-9]{1}$/ unless time_from_before_type_cast.nil?
@@ -163,8 +173,14 @@ class Host < ActiveRecord::Base
   has_many :events
   validates_presence_of :first_name, :last_name
   validates_length_of :first_name, :last_name, :maximum => 255
-  validates_format_of :phone, :mobile, :with => /^(\+[0-9]+ |0)[1-9]{2,} [0-9]{2,}(\-[0-9]+|)$/, :allow_nil => true
+  validates_format_of :phone, :mobile, :fax, :with => /^(\+[0-9]+ |0)[1-9]{2,} [0-9]{2,}(\-[0-9]+|)$/, :allow_nil => true
   validates_format_of :url, :with => /^(http|https)\:\/\/[a-zA-Z0-9\-\.]+[a-zA-Z0-9\-]+\.[a-zA-Z]{2,3}(\/\S*)?$/, :allow_nil => true
+  validates_length_of :company, :street, :housenumber_additional, :city, :maximum => 255
+  validates_format_of :street, :without => /(str|str.)$/i, :message => "is invalid. Please use 'straße' and not 'str' or 'str.'.", :allow_nil => true
+  validates_numericality_of :housenumber, :allow_nil => true
+  validates_length_of :postcode, :maximum => 5
+  validates_format_of :postcode, :with => /^[0-9]{5}$/, :allow_nil => true
+  validates_format_of :email, :with => /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/, :allow_nil => true
 end
 
 ##########

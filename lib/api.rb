@@ -1,8 +1,10 @@
+$:.unshift File.expand_path(File.dirname(__FILE__))
+
 require 'rubygems'
 require 'bundler'
 Bundler.require()
 
-require 'lib/config'
+require 'config'
 
 #TODO:
 ##validate which columns can be changed / are needed
@@ -19,12 +21,12 @@ require 'lib/config'
     #TODO: throw other error her, maybe a help message
     throw_error 400
   end
-  
+
   #request a list in rest/rails style
   get '/:source/:model/?' do
     logger
     validate
-    
+
     conditions = {:select => only_permitted_columns}
     #only set limit and offset explicit
     conditions[:limit] = params[:limit] unless params[:limit].nil?
@@ -36,7 +38,7 @@ require 'lib/config'
   get '/:source/:model/search/?' do
     logger
     validate
-    
+
     data = params[:model].singularize.capitalize.constantize
     # 1. search q in all permitted columns
     permitted_columns = only_permitted_columns
@@ -47,7 +49,7 @@ require 'lib/config'
         conditions[i] = "%#{params[:q]}%"
       end
     end
-    
+
     # 2. search other paramters
     params.each do |k,v|
       if permitted_columns.include?(k) && v.to_s.length > 0
@@ -64,7 +66,7 @@ require 'lib/config'
         end
       end
     end
-    
+
     # no output without parameters, otherwise it would return all datasets
     if conditions.size > 1
       c = {:select => permitted_columns, :conditions=>conditions}
@@ -114,7 +116,7 @@ require 'lib/config'
   get '/:source/:model/:id' do
     logger
     validate
-    
+
     begin
       output :model => params[:model].singularize.capitalize.constantize.find(params[:id], :select => only_permitted_columns)
     rescue Exception => e
@@ -126,7 +128,7 @@ require 'lib/config'
   put '/:source/:model/:id' do
     logger
     validate
-    
+
     begin
       data = params[:model].singularize.capitalize.constantize.find(params[:id])
       data.class.reflect_on_all_associations.map do |assoc|
@@ -155,7 +157,7 @@ require 'lib/config'
   delete '/:source/:model/:id' do
     logger
     validate
-    
+
     begin
       data = params[:model].singularize.capitalize.constantize.find(params[:id])
       data.destroy
@@ -181,4 +183,4 @@ require 'lib/config'
   delete '/*' do
     throw_error 400, :message => "Wrong url format."
   end
- 
+

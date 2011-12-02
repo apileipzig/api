@@ -1,4 +1,5 @@
-config = YAML.load_file('database.yml')
+env    = ENV['RACK_ENV'] || "development"
+config = YAML.load_file('database.yml')[env]
 
 #code borrowed from here: https://github.com/rails/rails/blob/master/activerecord/lib/active_record/railties/databases.rake
 
@@ -31,7 +32,7 @@ namespace :db do
   task :migrate do
 		ActiveRecord::Base.establish_connection(config)
     ActiveRecord::Migrator.migrate(
-      'db/migrate', 
+      'db/migrate',
       ENV["VERSION"] ? ENV["VERSION"].to_i : nil
     )
 
@@ -106,7 +107,7 @@ namespace :db do
     abort("no NAME specified. use `rake db:create_migration NAME=create_users`") if !name
 
     migrations_dir = File.join("db", "migrate")
-    version = ENV["VERSION"] || Time.now.strftime("%Y%m%d%H%M%S") 
+    version = ENV["VERSION"] || Time.now.strftime("%Y%m%d%H%M%S")
     filename = "#{version}_#{name}.rb"
     migration_name = name.gsub(/_(.)/) { $1.upcase }.gsub(/^(.)/) { $1.upcase }
 

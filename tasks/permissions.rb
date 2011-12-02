@@ -1,4 +1,5 @@
-config = YAML.load_file('database.yml')
+env    = ENV['RACK_ENV'] || "development"
+config = YAML.load_file('database.yml')[env]
 
 namespace :permissions do
   desc "Looks up all columns from tables beginning with data_ and creates CRUD Permissions for them"
