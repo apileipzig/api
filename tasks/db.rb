@@ -37,7 +37,7 @@ namespace :db do
     )
 
 		require 'active_record/schema_dumper'
-    File.open("db/schema.rb", "w") do |file|
+    File.open("db/schema.rb", "w", :external_encoding => Encoding.default_external) do |file|
       ActiveRecord::SchemaDumper.dump(ActiveRecord::Base.connection, file)
     end
   end
