@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 #first user
 User.create(:password => "123456", :password_confirmation => "123456", :email => "windisch@tml-consulting.net", :name => "Sven Windisch", :telefon => "0341/2231489", :admin => true, :active => true)
 
