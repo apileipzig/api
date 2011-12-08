@@ -37,7 +37,7 @@ namespace :db do
     )
 
 		require 'active_record/schema_dumper'
-    File.open("db/schema.rb", "w") do |file|
+    File.open("db/schema.rb", "w:utf-8") do |file| 
       ActiveRecord::SchemaDumper.dump(ActiveRecord::Base.connection, file)
     end
   end
@@ -67,7 +67,7 @@ namespace :db do
     ActiveRecord::Migrator.run(:up, "db/migrate/", version)
 
 		require 'active_record/schema_dumper'
-    File.open("db/schema.rb", "w") do |file|
+    File.open("db/schema.rb", "w:utf-8") do |file|
       ActiveRecord::SchemaDumper.dump(ActiveRecord::Base.connection, file)
     end
   end
@@ -80,7 +80,7 @@ namespace :db do
     ActiveRecord::Migrator.run(:down, "db/migrate/", version)
 
 		require 'active_record/schema_dumper'
-    File.open("db/schema.rb", "w") do |file|
+    File.open("db/schema.rb", "w:utf-8") do |file|
       ActiveRecord::SchemaDumper.dump(ActiveRecord::Base.connection, file)
     end
   end
