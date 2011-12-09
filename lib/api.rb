@@ -32,7 +32,7 @@ require 'config'
     conditions[:limit] = params[:limit] unless params[:limit].nil?
     conditions[:offset] = params[:offset] unless params[:offset].nil?
     #only set pagination if limit is set
-    output :data => params[:model].singularize.capitalize.constantize.all(conditions), :pagination => conditions[:limit] ? true : false
+    output :data => params[:model].singularize.capitalize.constantize.owner(params[:api_key]).all(conditions), :pagination => conditions[:limit] ? true : false
   end
 
   get '/:source/:model/search/?' do
@@ -73,7 +73,7 @@ require 'config'
       count = data.all(c).length
       c[:limit] = params[:limit] unless params[:limit].nil?
       c[:offset] = params[:offset] unless params[:offset].nil?
-      output :data => data.all(c), :pagination => c[:limit] ? true : false, :count => count
+      output :data => data.owner(params[:api_key]).all(c), :pagination => c[:limit] ? true : false, :count => count
     else
       output :error => "No search parameters."
     end
@@ -82,8 +82,7 @@ require 'config'
   get '/:source/:model/count/?' do
     logger
     validate
-    puts params[:model].singularize.capitalize.constantize.count
-    output :count => params[:model].singularize.capitalize.constantize.count
+    output :count => params[:model].singularize.capitalize.constantize.owner(params[:api_key]).count
   end
 
   #per model requests
@@ -105,6 +104,8 @@ require 'config'
       end
     end
 
+    data.owner = User.find_by_single_access_token(params[:api_key])
+
     if data.save
       output :success => {:message => "#{params[:model].singularize.capitalize} was saved with id = #{data.id}.", :id => data.id}
     else
@@ -118,9 +119,9 @@ require 'config'
     validate
 
     begin
-      output :model => params[:model].singularize.capitalize.constantize.find(params[:id], :select => only_permitted_columns)
+      output :model => params[:model].singularize.capitalize.constantize.owner(params[:api_key]).find(params[:id], :select => only_permitted_columns)
     rescue Exception => e
-      throw_error 404, :message => {:message => e.to_s, :id => params[:id].to_i}
+      throw_error 404
     end
   end
 
@@ -130,7 +131,7 @@ require 'config'
     validate
 
     begin
-      data = params[:model].singularize.capitalize.constantize.find(params[:id])
+      data = params[:model].singularize.capitalize.constantize.owner(params[:api_key]).find(params[:id])
       data.class.reflect_on_all_associations.map do |assoc|
         if assoc.macro == :has_many or assoc.macro == :has_and_belongs_to_many
           unless params[assoc.name].nil?
@@ -159,7 +160,7 @@ require 'config'
     validate
 
     begin
-      data = params[:model].singularize.capitalize.constantize.find(params[:id])
+      data = params[:model].singularize.capitalize.constantize.owner(params[:api_key]).find(params[:id])
       data.destroy
       output :success => {:message => "Deleted #{params[:model].singularize.capitalize} with id = #{params[:id]}.", :id => params[:id].to_i}
     rescue Exception => e

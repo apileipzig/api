@@ -7,4 +7,3 @@ class RemoveTimestampsFromPermissionsUsers < ActiveRecord::Migration
 		add_timestamps :permissions_users
 	end
 end
-

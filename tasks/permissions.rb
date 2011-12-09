@@ -12,13 +12,13 @@ namespace :permissions do
       table_name = table.split('_').third
       puts "Creating permissions for table #{table_name}"
 			permissions_to_generate = ActiveRecord::Base.connection.columns(table).map!{|column| column.name}
-			
+
 			table_name.singularize.capitalize.constantize.reflect_on_all_associations.map do |assoc|
 				if assoc.macro == :has_many or assoc.macro == :has_and_belongs_to_many
 					permissions_to_generate << assoc.name.to_s
 				end
 			end
-						
+
 			permissions_to_generate.each do |column_name|
         unless only_readable_list.include?(column_name)
           accesses =  %w[create read update delete count]
@@ -36,13 +36,13 @@ namespace :permissions do
             end
             puts "Permission #{access} for column #{column_name} in table #{source_name}_#{table_name} created"
 	        else
-            puts "Permission #{access} for column #{column_name} in table #{source_name}_#{table_name} already exists."	      
-	        end    
+            puts "Permission #{access} for column #{column_name} in table #{source_name}_#{table_name} already exists."
+	        end
         end
       end
     end
   end
-  
+
   desc "Renames Permissions for a given table and column preserving the rights given to users"
   task :rename, [:table, :old_name, :new_name] do |t, args|
 		ActiveRecord::Base.establish_connection(config)
@@ -58,13 +58,13 @@ namespace :permissions do
 		      end
 		    else
 		      puts "No Permissions with name #{args.old_name} for table #{args.table} found. Try running permissions:init first."
-		    end        
+		    end
       else
         puts "Table #{args.table} does not exist!"
       end
     else
       puts 'This script needs three parameters: table name, old column name, and new column name.'
-      puts 'Example: rake "permissions:rename[data_company, address, place]" <= Attention! Mind the quotes!' 
+      puts 'Example: rake "permissions:rename[data_company, address, place]" <= Attention! Mind the quotes!'
     end
   end
 
@@ -89,13 +89,32 @@ namespace :permissions do
 		  end
 		else
 		  puts "No Permissions with name #{args.column} for table #{args.table} found. Try running permissions:init first."
-		end        
+		end
       else
         puts "Table #{args.table} does not exist!"
       end
     else
       puts 'This script needs two parameters: table name and column name.'
-      puts 'Example: rake "permissions:delete[data_company, address]" <= Attention! Mind the quotes!' 
+      puts 'Example: rake "permissions:delete[data_company, address]" <= Attention! Mind the quotes!'
+    end
+  end
+
+  namespace :add do
+    desc "Add all permissions to an user."
+    task :all do
+      user = ENV["USER_NAME"] ? ENV["USER_NAME"] : nil
+      raise "USER_NAME is required" unless user
+
+      ActiveRecord::Base.establish_connection(config)
+      require 'lib/models'
+
+      user = User.find_by_email user
+
+      if user
+        user.permissions = user.permissions & Permission.all | Permission.all
+      else
+        raise "USER_NAME not found in database"
+      end
     end
   end
 end

@@ -1,3 +1,5 @@
+require 'test_helper'
+
 class DistrictTest < Test::Unit::TestCase
 
   def setup
@@ -22,6 +24,10 @@ class DistrictTest < Test::Unit::TestCase
       has "created_at"
       has "updated_at"
     end
+  end
+
+  test :get, '/districts/1', "returns no errors" do
+    assert_status 200
   end
 
 end

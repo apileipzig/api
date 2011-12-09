@@ -1,5 +1,5 @@
 # add /lib to loadpath
-$LOAD_PATH.unshift File.expand_path("../lib", File.dirname(__FILE__))
+$:.unshift File.expand_path("../lib", File.dirname(__FILE__))
 
 ENV['RACK_ENV'] = 'test'
 
@@ -41,19 +41,21 @@ class Test::Unit::TestCase
   # some dslish test stuff
   #
 
-  def self.test(verb, resource, &block)
-    define_method :"test #{verb.to_s.upcase} to \'#{resource}\'" do
+  def self.test(verb, resource, details=nil, &block)
+    name = ["test", "#{verb.to_s.upcase} to '#{resource}'", details].compact.join(" ")
+    raise "A method with name: '#{name}' is already defined" if method_defined?(name)
+
+    define_method name do
       send(verb, [@source, resource].join)
       instance_eval(&block)
     end
-
   end
 
   #
   # helper and utility functions for testing
   #
 
-  # creates and returns permissions of the given access type for all columns of the given model 
+  # creates and returns permissions of the given access type for all columns of the given model
   def create_permissions_for(klass, access)
     _, source, table = klass.table_name.split("_")
     klass.column_names.map do |cname|
