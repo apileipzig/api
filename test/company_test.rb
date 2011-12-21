@@ -32,7 +32,10 @@ class CompanyTest < Test::Unit::TestCase
     should "read a company" do
       get "/mediahandbook/companies/1"
       assert_status 200
-      assert_equal @company.to_json, last_response.body
+      assert_json(last_response.body) do
+        has "name", @company.name
+        has "sub_market_id", @company.sub_market_id
+      end
     end
 
     should "update a company" do
