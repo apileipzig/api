@@ -32,14 +32,16 @@ require 'config'
     conditions[:limit] = params[:limit] unless params[:limit].nil?
     conditions[:offset] = params[:offset] unless params[:offset].nil?
     #only set pagination if limit is set
-    output :data => params[:model].singularize.capitalize.constantize.owner(params[:api_key]).all(conditions), :pagination => conditions[:limit] ? true : false
+    model = params[:model].singularize.capitalize.constantize
+    data = model.respond_to?(:owned_by_or_public) ? model.owned_by_or_public(params[:api_key]).all(conditions) : model.all(conditions)
+    output :data => data, :pagination => conditions[:limit] ? true : false
   end
 
   get '/:source/:model/search/?' do
     logger
     validate
 
-    data = params[:model].singularize.capitalize.constantize
+    model = params[:model].singularize.capitalize.constantize
     # 1. search q in all permitted columns
     permitted_columns = only_permitted_columns
     conditions = [""]
@@ -53,7 +55,7 @@ require 'config'
     # 2. search other paramters
     params.each do |k,v|
       if permitted_columns.include?(k) && v.to_s.length > 0
-        comparator = data.columns.map{|c| c if c.name == k and c.type == :integer}.compact[0].nil? ? "LIKE" : "="
+        comparator = model.columns.map{|c| c if c.name == k and c.type == :integer}.compact[0].nil? ? "LIKE" : "="
         if(conditions[0].length > 0)
           conditions[0] << " AND #{k} #{comparator} ?"
         else
@@ -70,10 +72,11 @@ require 'config'
     # no output without parameters, otherwise it would return all datasets
     if conditions.size > 1
       c = {:select => permitted_columns, :conditions=>conditions}
-      count = data.all(c).length
+      count = model.all(c).length
       c[:limit] = params[:limit] unless params[:limit].nil?
       c[:offset] = params[:offset] unless params[:offset].nil?
-      output :data => data.owner(params[:api_key]).all(c), :pagination => c[:limit] ? true : false, :count => count
+      data = model.respond_to?(:owned_by_or_public) ? model.owned_by_or_public(params[:api_key]).all(c) : model.all(c)
+      output :data => data, :pagination => c[:limit] ? true : false, :count => count
     else
       output :error => "No search parameters."
     end
@@ -82,7 +85,9 @@ require 'config'
   get '/:source/:model/count/?' do
     logger
     validate
-    output :count => params[:model].singularize.capitalize.constantize.owner(params[:api_key]).count
+    model params[:model].singularize.capitalize.constantize
+    data = model.respond_to?(:owned_by_or_public) ? model.owned_by_or_public(params[:api_key]).count : model.count
+    output :count => data
   end
 
   #per model requests
@@ -91,25 +96,25 @@ require 'config'
     logger
     validate
 
-    data = params[:model].singularize.capitalize.constantize.new(create_only_permitted_data)
-    data.class.reflect_on_all_associations.map do |assoc|
+    model = params[:model].singularize.capitalize.constantize.new(create_only_permitted_data)
+    model.class.reflect_on_all_associations.map do |assoc|
       if assoc.macro == :has_many or assoc.macro == :has_and_belongs_to_many
         unless params[assoc.name].nil?
           assoc_array =[]
           assoc_array = params[assoc.name].split(",").map{ |n| n.to_i}
           #next two lines mean for example the following: Company.sub_branch_ids = [1,2,3]
           m = assoc.name.to_s.singularize + "_ids="
-          data.send m.to_sym, assoc_array
+          model.send m.to_sym, assoc_array
         end
       end
     end
 
-    data.owner = User.find_by_single_access_token(params[:api_key])
+    model.owner = User.find_by_single_access_token(params[:api_key]) if model.respond_to?(:owned_by_or_public)
 
-    if data.save
-      output :success => {:message => "#{params[:model].singularize.capitalize} was saved with id = #{data.id}.", :id => data.id}
+    if model.save
+      output :success => {:message => "#{params[:model].singularize.capitalize} was saved with id = #{model.id}.", :id => model.id}
     else
-      throw_error 404, :message => data.errors
+      throw_error 404, :message => model.errors
     end
   end
 
@@ -119,7 +124,11 @@ require 'config'
     validate
 
     begin
-      output :model => params[:model].singularize.capitalize.constantize.owner(params[:api_key]).find(params[:id], :select => only_permitted_columns)
+      scope = model = params[:model].singularize.capitalize.constantize
+      # data = model.respond_to?(:owned_by_or_public) ? model.owned_by_or_public(params[:api_key]).find(params[:id], :select => only_permitted_columns) : model.find(params[:id], :select => only_permitted_columns)
+      scope = model.owned_by_or_public(params[:api_key]) if model.respond_to?(:owned_by_or_public)
+      data = scope.find(params[:id], :select => only_permitted_columns)
+      output :model => data
     rescue Exception => e
       throw_error 404
     end
@@ -131,7 +140,15 @@ require 'config'
     validate
 
     begin
-      data = params[:model].singularize.capitalize.constantize.owner(params[:api_key]).find(params[:id])
+      model = params[:model].singularize.capitalize.constantize
+
+      if model.respond_to?(:owned_by_or_public)
+        data = model.owned_by_or_public(params[:api_key]).find(params[:id])
+        throw_error 403 if @user != data.owner
+      else
+        data = model.find(params[:id])
+      end
+
       data.class.reflect_on_all_associations.map do |assoc|
         if assoc.macro == :has_many or assoc.macro == :has_and_belongs_to_many
           unless params[assoc.name].nil?
@@ -149,6 +166,8 @@ require 'config'
       else
         throw_error 404, :message => data.errors
       end
+    rescue ActiveRecord::RecordNotFound => e
+      throw_error 404
     rescue Exception => e
       throw_error 404, :message => {:message => e.to_s, :id => params[:id].to_i}
     end
@@ -160,9 +179,19 @@ require 'config'
     validate
 
     begin
-      data = params[:model].singularize.capitalize.constantize.owner(params[:api_key]).find(params[:id])
+      model = params[:model].singularize.capitalize.constantize
+
+      if model.respond_to?(:owned_by_or_public)
+        data = model.owned_by_or_public(params[:api_key]).find(params[:id])
+        throw_error 403 if @user != data.owner
+      else
+        data = model.find(params[:id])
+      end
+
       data.destroy
       output :success => {:message => "Deleted #{params[:model].singularize.capitalize} with id = #{params[:id]}.", :id => params[:id].to_i}
+    rescue ActiveRecord::RecordNotFound => e
+      throw_error 404
     rescue Exception => e
       throw_error 404, :message => {:message => e.to_s, :id => params[:id].to_i}
     end

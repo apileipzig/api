@@ -14,7 +14,7 @@ require 'factory_girl'
 require 'authlogic/test_case'
 require 'factories'
 require 'database_cleaner'
-
+require 'active_support/testing/assertions'
 
 DatabaseCleaner.strategy = :transaction
 DatabaseCleaner.clean_with(:truncation)
@@ -24,6 +24,7 @@ class Test::Unit::TestCase
   include Rack::Test::Methods
   include AssertJson
   include Api::Assertions
+  include ActiveSupport::Testing::Assertions
 
   def setup
     DatabaseCleaner.start
@@ -68,19 +69,24 @@ class Test::Unit::TestCase
     JSON.parse(last_response.body)
   end
 
-  # returns the current @user or creates one with default values via FactoryGirl
-  def api_user
-    @user ||= FactoryGirl.create(:user)
-  end
-
-  # returns the api_user's api_key
-  def api_key
-    api_user && api_user.single_access_token
-  end
-
   # override rack-test's get method in order to add some default values
+  def post(url, opts={})
+    opts[:api_key] ||= @api_user.api_key
+    super(url, opts)
+  end
+
   def get(url, opts={})
-    opts[:api_key] ||= api_key
+    opts[:api_key] ||= @api_user.api_key
+    super(url, opts)
+  end
+
+  def put(url, opts={})
+    opts[:api_key] ||= @api_user.api_key
+    super(url, opts)
+  end
+
+  def delete(url, opts={})
+    opts[:api_key] ||= @api_user.api_key
     super(url, opts)
   end
 

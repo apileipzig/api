@@ -49,8 +49,6 @@ ActiveRecord::Schema.define(:version => 20111202182217) do
     t.string   "email"
     t.string   "fax"
     t.text     "comment"
-    t.integer  "owner_id"
-    t.boolean  "public",                 :default => true
   end
 
   create_table "data_calendar_venues", :force => true do |t|
@@ -65,8 +63,6 @@ ActiveRecord::Schema.define(:version => 20111202182217) do
     t.string   "url"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "owner_id"
-    t.boolean  "public",                 :default => true
   end
 
   create_table "data_district_districts", :force => true do |t|
@@ -74,8 +70,6 @@ ActiveRecord::Schema.define(:version => 20111202182217) do
     t.string   "name"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "owner_id"
-    t.boolean  "public",     :default => true
   end
 
   create_table "data_district_ihkcompanies", :force => true do |t|
@@ -105,8 +99,6 @@ ActiveRecord::Schema.define(:version => 20111202182217) do
     t.integer  "other"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "owner_id"
-    t.boolean  "public",                            :default => true
   end
 
   create_table "data_district_statistics", :force => true do |t|
@@ -325,8 +317,6 @@ ActiveRecord::Schema.define(:version => 20111202182217) do
     t.integer  "religion_protestant"
     t.integer  "religion_catholic"
     t.integer  "religion_other_or_none"
-    t.integer  "owner_id"
-    t.boolean  "public",                                   :default => true
   end
 
   create_table "data_district_streets", :force => true do |t|
@@ -338,8 +328,6 @@ ActiveRecord::Schema.define(:version => 20111202182217) do
     t.string   "postcode"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "owner_id"
-    t.boolean  "public",                 :default => true
   end
 
   create_table "data_mediahandbook_branches", :force => true do |t|
@@ -350,8 +338,6 @@ ActiveRecord::Schema.define(:version => 20111202182217) do
     t.text     "description",   :limit => 255
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "owner_id"
-    t.boolean  "public",                       :default => true
   end
 
   create_table "data_mediahandbook_companies", :force => true do |t|
@@ -381,8 +367,6 @@ ActiveRecord::Schema.define(:version => 20111202182217) do
     t.text     "resources"
     t.text     "past_customers"
     t.integer  "mkw_branch_id"
-    t.integer  "owner_id"
-    t.boolean  "public",                 :default => true
   end
 
   create_table "data_mediahandbook_people", :force => true do |t|
@@ -394,8 +378,6 @@ ActiveRecord::Schema.define(:version => 20111202182217) do
     t.string   "occupation"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "owner_id"
-    t.boolean  "public",     :default => true
   end
 
   create_table "mediahandbook_branches_companies", :id => false, :force => true do |t|

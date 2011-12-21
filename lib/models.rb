@@ -2,16 +2,26 @@
 
 ActiveRecord::Base.include_root_in_json = false # removes table names in json
 
-class ApiModel < ActiveRecord::Base
-  belongs_to :owner, :class_name => "User"
-  scope :owner, lambda {|single_access_token| where("owner_id = ? OR public = ?", User.find_by_single_access_token(single_access_token), true) }
+module Api
+  module Ownership
+    def self.included(base)
+      base.instance_eval do
+        belongs_to :owner, :class_name => "User"
+        scope :owned_by_or_public, lambda {|single_access_token| where("owner_id = ? OR public = ?", User.find_by_single_access_token(single_access_token), true) }
 
-  validates_presence_of :owner_id
+        validates_presence_of :owner_id
+      end
+    end
+  end
 end
 
 class User < ActiveRecord::Base
   acts_as_authentic
   has_and_belongs_to_many :permissions
+
+  def api_key
+    single_access_token
+  end
 end
 
 class Permission < ActiveRecord::Base
@@ -28,7 +38,7 @@ end
 #Mediahandbook
 ##############
 
-class Company < ApiModel
+class Company < ActiveRecord::Base
   set_table_name "data_mediahandbook_companies"
   belongs_to :sub_market, :class_name => "Branch", :conditions => "internal_type = 'sub_market'"
   belongs_to :main_branch, :class_name => "Branch", :conditions => "internal_type = 'main_branch'"
@@ -73,12 +83,12 @@ class Company < ApiModel
   end
 end
 
-class Branch < ApiModel
+class Branch < ActiveRecord::Base
   set_table_name "data_mediahandbook_branches"
   has_and_belongs_to_many :companies, :join_table => "mediahandbook_branches_companies"
 end
 
-class Person < ApiModel
+class Person < ActiveRecord::Base
   set_table_name "data_mediahandbook_people"
   belongs_to :company
 
@@ -101,7 +111,8 @@ end
 #Calendar
 #########
 
-class Event < ApiModel
+class Event < ActiveRecord::Base
+  include Api::Ownership
   set_table_name "data_calendar_events"
 
   belongs_to :category, :class_name => "Branch", :conditions => "internal_type = 'sub_market'"
@@ -152,7 +163,7 @@ class Event < ApiModel
   end
 end
 
-class Venue < ApiModel
+class Venue < ActiveRecord::Base
   set_table_name "data_calendar_venues"
   has_many :events
 
@@ -168,7 +179,7 @@ class Venue < ApiModel
   validates_format_of :url, :with => /^(http|https)\:\/\/[a-zA-Z0-9\-\.]+[a-zA-Z0-9\-]+\.[a-zA-Z]{2,3}(\/\S*)?$/, :allow_nil => true
 end
 
-class Host < ApiModel
+class Host < ActiveRecord::Base
   set_table_name "data_calendar_hosts"
   has_many :events
   validates_presence_of :first_name, :last_name
@@ -187,7 +198,7 @@ end
 #Districts
 ##########
 
-class District < ApiModel
+class District < ActiveRecord::Base
   set_table_name "data_district_districts"
   validates_presence_of :number, :name
   validates_numericality_of :number, :only_integer => true
@@ -196,7 +207,7 @@ class District < ApiModel
 end
 
 
-class Street < ApiModel
+class Street < ActiveRecord::Base
   set_table_name "data_district_streets"
   belongs_to :district, :class_name => "District"
   validates_presence_of :district_id
@@ -208,7 +219,7 @@ class Street < ApiModel
   validates_length_of :postcode, :maximum => 5
 end
 
-class Statistic < ApiModel
+class Statistic < ActiveRecord::Base
   set_table_name "data_district_statistics"
   belongs_to :district, :class_name => "District"
   validates_presence_of :district_id
@@ -219,7 +230,7 @@ class Statistic < ApiModel
 
 end
 
-class Ihkcompany < ApiModel
+class Ihkcompany < ActiveRecord::Base
   set_table_name "data_district_ihkcompanies"
   belongs_to :district, :class_name => "District"
   validates_presence_of :district_id

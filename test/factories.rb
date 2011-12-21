@@ -19,7 +19,11 @@ FactoryGirl.define do
 
   factory :branch do
     sequence(:name) {|n| "name-#{n}"}
-    association :owner, :factory => :user
+  end
+
+  factory :company do
+    sequence(:name) {|n| "name-#{n}"}
+    association :sub_market, :factory => :branch, :internal_type => 'sub_market'
   end
 
   ########### CALENDAR
@@ -27,12 +31,10 @@ FactoryGirl.define do
   factory :host do
     sequence(:first_name) {|n| "first_name-#{n}"}
     sequence(:last_name) {|n| "last_name-#{n}"}
-    association :owner, :factory => :user
   end
 
   factory :venue do
     sequence(:name) {|n| "name-#{n}"}
-    association :owner, :factory => :user
   end
 
   factory :event do
@@ -50,6 +52,5 @@ FactoryGirl.define do
   factory :district do
     sequence(:name)   {|n| "district-#{n}"}
     sequence(:number)
-    association :owner, :factory => :user
   end
 end

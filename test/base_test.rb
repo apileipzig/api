@@ -1,7 +1,10 @@
 class BaseTest < Test::Unit::TestCase
 
   context "GET '/'" do
-    setup { get '/' }
+    setup do
+      @api_user = FactoryGirl.create(:user)
+      get '/'
+    end
 
     should "return an error" do
       assert_status 400
