@@ -2,5 +2,6 @@ rvm:
  - 1.8.7
  - 1.9.2
  - 1.9.3
+ - ree
 before_script: "sh -c 'cp database_example.yml database.yml'"
 script: "bundle exec rake db:drop db:create db:migrate db:seed test"
