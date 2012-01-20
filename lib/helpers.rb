@@ -51,7 +51,7 @@ helpers do
   #check every parameter if it consists only of alphanumeric chars
   def validate_only_alphanumeric
     bad_params = []
-    params.each do |k,v|
+    params.keep_if{|k,v| !v.kind_of?(Array)}.each do |k,v|
       if k == 'limit' or k == 'offset'
         bad_params << k unless v.match(/^\d+$/) unless v.nil?
       else
