@@ -1,8 +1,12 @@
 $:.unshift File.expand_path(File.dirname(__FILE__))
 
+env = ENV['RACK_ENV'] || "development"
+
 require 'rubygems'
 require 'bundler'
-Bundler.require()
+Bundler.require(:default, env.to_sym)
+
+settings.environment = env
 
 require 'config'
 

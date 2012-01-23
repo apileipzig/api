@@ -1,24 +1,16 @@
 # add /lib to loadpath
 $:.unshift File.expand_path("../lib", File.dirname(__FILE__))
 
-ENV['RACK_ENV'] = 'test'
+env = ENV['RACK_ENV'] = "test"
 
+require 'bundler'
+Bundler.require(:default, env.to_sym)
 require 'api'
-require 'test/unit'
-require 'assert_json'
-require 'rack/test'
-require 'turn'
-require 'shoulda-context'
 require 'assertions'
-require 'factory_girl'
-require 'authlogic/test_case'
 require 'factories'
-require 'database_cleaner'
-require 'active_support/testing/assertions'
 
 DatabaseCleaner.strategy = :transaction
 DatabaseCleaner.clean_with(:truncation)
-
 
 class Test::Unit::TestCase
   include Rack::Test::Methods

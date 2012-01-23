@@ -24,8 +24,8 @@ ActiveRecord::Schema.define(:version => 20111202182217) do
     t.string   "name"
     t.text     "description"
     t.string   "url"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",                     :null => false
+    t.datetime "updated_at",                     :null => false
     t.string   "image_url"
     t.string   "document_url"
     t.integer  "owner_id"
@@ -38,8 +38,8 @@ ActiveRecord::Schema.define(:version => 20111202182217) do
     t.string   "phone"
     t.string   "mobile"
     t.string   "url"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",             :null => false
+    t.datetime "updated_at",             :null => false
     t.string   "company"
     t.string   "street"
     t.integer  "housenumber"
@@ -61,15 +61,15 @@ ActiveRecord::Schema.define(:version => 20111202182217) do
     t.string   "phone"
     t.text     "description"
     t.string   "url"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",             :null => false
+    t.datetime "updated_at",             :null => false
   end
 
   create_table "data_district_districts", :force => true do |t|
     t.integer  "number"
     t.string   "name"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
   end
 
   create_table "data_district_ihkcompanies", :force => true do |t|
@@ -97,8 +97,8 @@ ActiveRecord::Schema.define(:version => 20111202182217) do
     t.integer  "private_services"
     t.integer  "extraterritorial_organisations"
     t.integer  "other"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",                        :null => false
+    t.datetime "updated_at",                        :null => false
   end
 
   create_table "data_district_statistics", :force => true do |t|
@@ -312,8 +312,8 @@ ActiveRecord::Schema.define(:version => 20111202182217) do
     t.integer  "citizenship_inapplicable"
     t.integer  "citizenship_unknown3"
     t.integer  "citizenship_not_specified"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",                               :null => false
+    t.datetime "updated_at",                               :null => false
     t.integer  "religion_protestant"
     t.integer  "religion_catholic"
     t.integer  "religion_other_or_none"
@@ -326,8 +326,8 @@ ActiveRecord::Schema.define(:version => 20111202182217) do
     t.integer  "housenumber"
     t.string   "housenumber_additional"
     t.string   "postcode"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",             :null => false
+    t.datetime "updated_at",             :null => false
   end
 
   create_table "data_mediahandbook_branches", :force => true do |t|
@@ -336,8 +336,8 @@ ActiveRecord::Schema.define(:version => 20111202182217) do
     t.string   "internal_key"
     t.string   "name"
     t.text     "description",   :limit => 255
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",                   :null => false
+    t.datetime "updated_at",                   :null => false
   end
 
   create_table "data_mediahandbook_companies", :force => true do |t|
@@ -361,8 +361,8 @@ ActiveRecord::Schema.define(:version => 20111202182217) do
     t.string   "url_primary"
     t.string   "url_secondary"
     t.text     "main_activity"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",             :null => false
+    t.datetime "updated_at",             :null => false
     t.text     "products"
     t.text     "resources"
     t.text     "past_customers"
@@ -376,8 +376,8 @@ ActiveRecord::Schema.define(:version => 20111202182217) do
     t.string   "title"
     t.string   "position"
     t.string   "occupation"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
   end
 
   create_table "mediahandbook_branches_companies", :id => false, :force => true do |t|
@@ -386,8 +386,8 @@ ActiveRecord::Schema.define(:version => 20111202182217) do
   end
 
   create_table "permissions", :force => true do |t|
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
     t.string   "access"
     t.string   "table"
     t.string   "column"
@@ -413,8 +413,8 @@ ActiveRecord::Schema.define(:version => 20111202182217) do
 
   create_table "temp_syncs", :force => true do |t|
     t.text     "json"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
   end
 
   create_table "users", :force => true do |t|
@@ -431,8 +431,8 @@ ActiveRecord::Schema.define(:version => 20111202182217) do
     t.datetime "last_login_at"
     t.string   "current_login_ip"
     t.string   "last_login_ip"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",                         :null => false
+    t.datetime "updated_at",                         :null => false
     t.boolean  "admin"
     t.boolean  "active"
     t.string   "name"
