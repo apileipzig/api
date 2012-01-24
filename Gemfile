@@ -12,6 +12,7 @@ group :development do
 end
 
 group :test do
+  gem "sqlite3"
   gem "rack-test", :require => "rack/test"
   gem "assert_json"
   gem "turn"
