@@ -8,4 +8,11 @@ test:
   adapter: sqlite3
   database: db/test.sqlite3
 
-
+#example for mysql
+#production:
+#  database: db_name
+#  adapter: mysql2
+#  host: localhost
+#  username: db_user
+#  password: db_pass
+#  encoding: utf8

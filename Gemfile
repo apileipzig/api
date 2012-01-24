@@ -7,14 +7,21 @@ gem "authlogic"
 gem "rake"
 gem "shotgun"
 
-gem "sqlite3",          :groups => [:development, :test]
-gem "rack-test",        :groups => [:development, :test], :require => "rack/test"
-gem "assert_json",      :groups => [:development, :test]
-gem "turn",             :groups => [:development, :test]
-gem "minitest",         :groups => [:development, :test]
-gem "shoulda-context",  :groups => [:development, :test]
-gem "factory_girl",     :groups => [:development, :test]
-gem "database_cleaner", :groups => [:development, :test]
-gem "activesupport",    :group => :test, :require => "active_support/testing/assertions"
+group :development do
+  gem "sqlite3"
+end
 
-gem "mysql2", :group => :production
+group :test do
+  gem "rack-test", :require => "rack/test"
+  gem "assert_json"
+  gem "turn"
+  gem "minitest"
+  gem "shoulda-context"
+  gem "factory_girl"
+  gem "database_cleaner"
+  gem "activesupport", :require => "active_support/testing/assertions"
+end
+
+group :production do
+  gem "mysql2", "~> 0.2.0"
+end
