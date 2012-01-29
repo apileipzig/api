@@ -96,9 +96,9 @@ helpers do
         query_string = ""
         request.env['rack.request.query_hash'].each { |k,v| query_string += "#{k}=#{v}&" unless k == 'offset' }
 
-        search = request.env['REQUEST_URI'].match(/(\/search\/?)$/) ? Regexp.last_match(0) : ""
+        search = request.env['REQUEST_URI'].match(/[\w\/]+(\/search\/?\?)/) ? Regexp.last_match(1) : ""
 
-        url = API_URL+params[:source]+'/'+params[:model]+search+'?'+query_string
+        url = API_URL+params[:source]+'/'+params[:model]+search+query_string
 
         #only next if limit+offset < count
         ne = params[:offset] + params[:limit]
