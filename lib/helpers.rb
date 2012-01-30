@@ -96,7 +96,7 @@ helpers do
         query_string = ""
         request.env['rack.request.query_hash'].each { |k,v| query_string += "#{k}=#{v}&" unless k == 'offset' }
 
-        search = request.env['REQUEST_URI'].match(/[\w\/]+(\/search\/?\?)/) ? Regexp.last_match(1) : ""
+        search = request.env['REQUEST_URI'].match(/[\w\/]+(\/search\/?\?)/) ? Regexp.last_match(1) : "?"
 
         url = API_URL+params[:source]+'/'+params[:model]+search+query_string
 
