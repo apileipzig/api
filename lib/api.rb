@@ -89,7 +89,7 @@ require 'config'
   get '/:source/:model/count/?' do
     logger
     validate
-    model params[:model].singularize.capitalize.constantize
+    model = params[:model].singularize.capitalize.constantize
     data = model.respond_to?(:owned_by_or_public) ? model.owned_by_or_public(params[:api_key]).count : model.count
     output :count => data
   end
