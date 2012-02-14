@@ -211,6 +211,7 @@ helpers do
     data_params.delete(:limit)
     data_params.delete(:offset)
     data_params.delete("id")
+    data_params.delete("format")
 
     forbidden_params =[]
     data_params.each do |k,v|
