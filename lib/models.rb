@@ -39,7 +39,7 @@ end
 ##############
 
 class Company < ActiveRecord::Base
-  set_table_name "data_mediahandbook_companies"
+  self.table_name = "data_mediahandbook_companies"
   belongs_to :sub_market, :class_name => "Branch", :conditions => "internal_type = 'sub_market'"
   belongs_to :main_branch, :class_name => "Branch", :conditions => "internal_type = 'main_branch'"
   belongs_to :mkw_branch, :class_name => "Branch", :conditions => "internal_type = 'mkw_branch'"
@@ -84,12 +84,12 @@ class Company < ActiveRecord::Base
 end
 
 class Branch < ActiveRecord::Base
-  set_table_name "data_mediahandbook_branches"
+  self.table_name = "data_mediahandbook_branches"
   has_and_belongs_to_many :companies, :join_table => "mediahandbook_branches_companies"
 end
 
 class Person < ActiveRecord::Base
-  set_table_name "data_mediahandbook_people"
+  self.table_name = "data_mediahandbook_people"
   belongs_to :company
 
   validates_presence_of :company_id, :first_name, :last_name, :occupation
@@ -113,7 +113,7 @@ end
 
 class Event < ActiveRecord::Base
   include Api::Ownership
-  set_table_name "data_calendar_events"
+  self.table_name = "data_calendar_events"
 
   belongs_to :category, :class_name => "Branch", :conditions => "internal_type = 'sub_market'"
   belongs_to :host
@@ -164,7 +164,7 @@ class Event < ActiveRecord::Base
 end
 
 class Venue < ActiveRecord::Base
-  set_table_name "data_calendar_venues"
+  self.table_name = "data_calendar_venues"
   has_many :events
 
   validates_presence_of :name
@@ -180,7 +180,7 @@ class Venue < ActiveRecord::Base
 end
 
 class Host < ActiveRecord::Base
-  set_table_name "data_calendar_hosts"
+  self.table_name = "data_calendar_hosts"
   has_many :events
   validates_presence_of :first_name, :last_name
   validates_length_of :first_name, :last_name, :maximum => 255
@@ -199,7 +199,7 @@ end
 ##########
 
 class District < ActiveRecord::Base
-  set_table_name "data_district_districts"
+  self.table_name = "data_district_districts"
   validates_presence_of :number, :name
   validates_numericality_of :number, :only_integer => true
   validates_length_of :name, :maximum => 255
@@ -208,7 +208,7 @@ end
 
 
 class Street < ActiveRecord::Base
-  set_table_name "data_district_streets"
+  self.table_name = "data_district_streets"
   belongs_to :district, :class_name => "District"
   validates_presence_of :district_id
   validates_numericality_of :district_id
@@ -220,7 +220,7 @@ class Street < ActiveRecord::Base
 end
 
 class Statistic < ActiveRecord::Base
-  set_table_name "data_district_statistics"
+  self.table_name = "data_district_statistics"
   belongs_to :district, :class_name => "District"
   validates_presence_of :district_id
   validates_numericality_of :district_id
@@ -231,7 +231,7 @@ class Statistic < ActiveRecord::Base
 end
 
 class Ihkcompany < ActiveRecord::Base
-  set_table_name "data_district_ihkcompanies"
+  self.table_name = "data_district_ihkcompanies"
   belongs_to :district, :class_name => "District"
   validates_presence_of :district_id
   validates_numericality_of :district_id
