@@ -78,6 +78,7 @@ class PropertyTest < Test::Unit::TestCase
   context "A regular user" do
     setup do
       user = Factory.create(:user)
+      user.permissions << create_permissions_for(Event, :create)
       user.permissions << create_permissions_for(Event, :read)
       user.permissions << create_permissions_for(Event, :update)
       user.permissions << create_permissions_for(Event, :delete)
@@ -115,6 +116,16 @@ class PropertyTest < Test::Unit::TestCase
       delete '/calendar/events/2'
       assert_status 404
       assert_body { |json| json.element "error", "Not found." }
+    end
+
+    should "create an event without setting an owner_id" do
+      post 'calendar/events', FactoryGirl.attributes_for(
+        :event,
+        :host_id => Factory.create(:host).id,
+        :venue_id => Factory.create(:venue).id,
+        :category_id => Factory.create(:branch, :internal_type => "sub_market").id
+      )
+      assert_status 200
     end
   end
 end

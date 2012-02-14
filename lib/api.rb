@@ -113,7 +113,7 @@ require 'config'
       end
     end
 
-    model.owner = User.find_by_single_access_token(params[:api_key]) if model.respond_to?(:owned_by_or_public)
+    model.owner = User.find_by_single_access_token(params[:api_key]) if model.respond_to?(:owner)
 
     if model.save
       output :success => {:message => "#{params[:model].singularize.capitalize} was saved with id = #{model.id}.", :id => model.id}
