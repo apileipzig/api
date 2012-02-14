@@ -3,6 +3,7 @@ $:.unshift File.expand_path("../lib", File.dirname(__FILE__))
 
 env = ENV['RACK_ENV'] = "test"
 
+require 'rubygems'
 require 'bundler'
 Bundler.require(:default, env.to_sym)
 require 'api'
