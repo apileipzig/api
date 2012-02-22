@@ -7,8 +7,17 @@ require 'rubygems'
 require 'bundler'
 Bundler.require(:default, env.to_sym)
 require 'api'
+require 'test/unit'
+require 'assert_json'
+require 'rack/test'
+require 'turn'
+require 'shoulda-context'
+require 'shoulda-matchers'
 require 'assertions'
 require 'factories'
+require 'database_cleaner'
+require 'active_support/testing/assertions'
+
 
 DatabaseCleaner.strategy = :transaction
 DatabaseCleaner.clean_with(:truncation)
