@@ -18,7 +18,8 @@ group :test do
   gem "turn"
   gem "minitest"
   gem "shoulda-context"
-  gem "factory_girl"
+  gem "shoulda-matchers"
+  gem "factory_girl", "~> 2.2.0"
   gem "database_cleaner"
   gem "activesupport", :require => "active_support/testing/assertions"
 end
