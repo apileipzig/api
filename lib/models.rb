@@ -67,7 +67,7 @@ class Company < ActiveRecord::Base
   validates_format_of :postcode, :with => /^[0-9]{5}$/, :allow_nil => true
   validates_format_of :phone_primary, :phone_secondary, :fax_primary, :fax_secondary, :mobile_primary, :mobile_secondary, :with => /^(\+[0-9]+ |0)[1-9]{2,} [0-9]{2,}(\-[0-9]+|)$/, :allow_nil => true
   validates_format_of :email_primary, :email_secondary, :with => /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/, :allow_nil => true
-  validates_format_of :url_primary, :url_secondary, :with => /^(http|https)\:\/\/[a-zA-Z0-9\-\.]+[a-zA-Z0-9\-]+\.[a-zA-Z]{2,3}(\/\S*)?$/, :allow_nil => true
+  validates_format_of :url_primary, :url_secondary, :with => /^(http|https)\:\/\/[a-zA-Z0-9\-\.]+[a-zA-Z0-9\-]+\.[a-zA-Z]{2,4}(\/\S*)?$/, :allow_nil => true
 
   def existence_of_main_branch_id
     errors.add(:main_branch_id, "does not exist.") unless Branch.exists?(:id => main_branch_id, :internal_type => 'main_branch') unless main_branch_id.nil?
@@ -138,9 +138,9 @@ class Event < ActiveRecord::Base
   validate :format_of_time_from, :allow_nil => true
   validate :format_of_time_to, :allow_nil => true
   #TODO: strip html tags and such stuff from description
-  validates_format_of :url, :with => /^(http|https)\:\/\/[a-zA-Z0-9\-\.]+[a-zA-Z0-9\-]+\.[a-zA-Z]{2,3}(\/\S*)?$/, :allow_nil => true
-  validates_format_of :image_url, :with => /^(http|https)\:\/\/[a-zA-Z0-9\-\.]+[a-zA-Z0-9\-]+\.[a-zA-Z]{2,3}(\/\S*)?$/, :allow_nil => true
-  validates_format_of :document_url, :with => /^(http|https)\:\/\/[a-zA-Z0-9\-\.]+[a-zA-Z0-9\-]+\.[a-zA-Z]{2,3}(\/\S*)?$/, :allow_nil => true
+  validates_format_of :url, :with => /^(http|https)\:\/\/[a-zA-Z0-9\-\.]+[a-zA-Z0-9\-]+\.[a-zA-Z]{2,4}(\/\S*)?$/, :allow_nil => true
+  validates_format_of :image_url, :with => /^(http|https)\:\/\/[a-zA-Z0-9\-\.]+[a-zA-Z0-9\-]+\.[a-zA-Z]{2,4}(\/\S*)?$/, :allow_nil => true
+  validates_format_of :document_url, :with => /^(http|https)\:\/\/[a-zA-Z0-9\-\.]+[a-zA-Z0-9\-]+\.[a-zA-Z]{2,4}(\/\S*)?$/, :allow_nil => true
 
   def format_of_time_from
     errors.add(:time_from, "is invalid.") unless time_from_before_type_cast =~ /^[0-2]{1}[0-9]{1}\:[0-5]{1}[0-9]{1}\:[0-5]{1}[0-9]{1}$/ unless time_from_before_type_cast.nil?
@@ -176,7 +176,7 @@ class Venue < ActiveRecord::Base
   validates_format_of :postcode, :with => /^[0-9]{5}$/, :allow_nil => true
   validates_format_of :phone, :with => /^(\+[0-9]+ |0)[1-9]{2,} [0-9]{2,}(\-[0-9]+|)$/, :allow_nil => true
   #TODO: strip html tags and such stuff from description
-  validates_format_of :url, :with => /^(http|https)\:\/\/[a-zA-Z0-9\-\.]+[a-zA-Z0-9\-]+\.[a-zA-Z]{2,3}(\/\S*)?$/, :allow_nil => true
+  validates_format_of :url, :with => /^(http|https)\:\/\/[a-zA-Z0-9\-\.]+[a-zA-Z0-9\-]+\.[a-zA-Z]{2,4}(\/\S*)?$/, :allow_nil => true
 end
 
 class Host < ActiveRecord::Base
@@ -185,7 +185,7 @@ class Host < ActiveRecord::Base
   validates_presence_of :first_name, :last_name
   validates_length_of :first_name, :last_name, :maximum => 255
   validates_format_of :phone, :mobile, :fax, :with => /^(\+[0-9]+ |0)[1-9]{2,} [0-9]{2,}(\-[0-9]+|)$/, :allow_nil => true
-  validates_format_of :url, :with => /^(http|https)\:\/\/[a-zA-Z0-9\-\.]+[a-zA-Z0-9\-]+\.[a-zA-Z]{2,3}(\/\S*)?$/, :allow_nil => true
+  validates_format_of :url, :with => /^(http|https)\:\/\/[a-zA-Z0-9\-\.]+[a-zA-Z0-9\-]+\.[a-zA-Z]{2,4}(\/\S*)?$/, :allow_nil => true
   validates_length_of :company, :street, :housenumber_additional, :city, :maximum => 255
   validates_format_of :street, :without => /(str|str.)$/i, :message => "is invalid. Please use 'straße' and not 'str' or 'str.'.", :allow_nil => true
   validates_numericality_of :housenumber, :allow_nil => true
