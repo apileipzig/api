@@ -25,7 +25,7 @@ GEM
     i18n (0.5.0)
     json (1.6.5)
     minitest (2.10.1)
-    mysql2 (0.2.18)
+    pg (0.13.2)
     rack (1.4.1)
     rack-protection (1.2.0)
       rack
@@ -57,7 +57,7 @@ DEPENDENCIES
   factory_girl
   json
   minitest
-  mysql2 (~> 0.2.0)
+  pg
   rack-test
   rake
   shotgun
