@@ -4,6 +4,9 @@
 u = User.new(:password => "123456", :password_confirmation => "123456", :email => "admin@apileipzig.de", :name => "Api Admin", :telefon => "0341/1234567", :admin => true, :active => true, :single_access_token => "a")
 u.save!
 
+u = User.new(:password => "123456", :password_confirmation => "123456", :email => "admin2@apileipzig.de", :name => "Api2 Admin2", :telefon => "0341/1234567", :admin => true, :active => true, :single_access_token => "b")
+u.save!
+
 #branches
 
 Branch.create(:name => 'Cluster Medien & Kreativwirtschaft', :internal_type => 'cluster')
