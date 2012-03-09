@@ -14,7 +14,11 @@ module ActiveRecord
   end
 end
 
-db_config = YAML.load_file(APP_ROOT + '/database.yml')[settings.environment.to_s]
+begin
+  db_config = YAML.load_file(APP_ROOT + '/database.yml')[settings.environment.to_s]
+rescue
+  db_config = URI.parse(ENV['DATABASE_URL'])
+end
 
 ActiveRecord::Base.establish_connection(db_config)
 
