@@ -16,21 +16,20 @@ end
 
 begin
   db_config = YAML.load_file(APP_ROOT + '/database.yml')[settings.environment.to_s]
-  ActiveRecord::Base.establish_connection(db_config)
 rescue
   db = URI.parse(ENV['DATABASE_URL'])
 
-  ActiveRecord::Base.establish_connection(
+  db_config = {
     :adapter  => db.scheme == 'postgres' ? 'postgresql' : db.scheme,
     :host     => db.host,
     :username => db.user,
     :password => db.password,
     :database => db.path[1..-1],
     :encoding => 'utf8'
-  )
+  }
 end
 
-
+ActiveRecord::Base.establish_connection(db_config)
 
 require APP_ROOT + '/lib/models.rb'
 require APP_ROOT + '/lib/helpers.rb'

@@ -1,5 +1,20 @@
 env    = ENV['RACK_ENV'] || "development"
-config = YAML.load_file('database.yml')[env]
+
+
+begin
+  config = YAML.load_file('database.yml')[env]
+rescue
+  db = URI.parse(ENV['DATABASE_URL'])
+
+  config = {
+    :adapter  => db.scheme == 'postgres' ? 'postgresql' : db.scheme,
+    :host     => db.host,
+    :username => db.user,
+    :password => db.password,
+    :database => db.path[1..-1],
+    :encoding => 'utf8'
+  }
+end
 
 #code borrowed from here: https://github.com/rails/rails/blob/master/activerecord/lib/active_record/railties/databases.rake
 
@@ -37,7 +52,7 @@ namespace :db do
     )
 
 		require 'active_record/schema_dumper'
-    File.open("db/schema.rb", "w:utf-8") do |file| 
+    File.open("db/schema.rb", "w:utf-8") do |file|
       ActiveRecord::SchemaDumper.dump(ActiveRecord::Base.connection, file)
     end
   end
