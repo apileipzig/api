@@ -1,5 +1,18 @@
 env    = ENV['RACK_ENV'] || "development"
-config = YAML.load_file('database.yml')[env]
+begin
+  config = YAML.load_file('database.yml')[env]
+rescue
+  db = URI.parse(ENV['DATABASE_URL'])
+
+  config = {
+    :adapter  => db.scheme == 'postgres' ? 'postgresql' : db.scheme,
+    :host     => db.host,
+    :username => db.user,
+    :password => db.password,
+    :database => db.path[1..-1],
+    :encoding => 'utf8'
+  }
+end
 
 namespace :permissions do
   desc "Looks up all columns from tables beginning with data_ and creates CRUD Permissions for them"
