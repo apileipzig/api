@@ -35,4 +35,4 @@ require APP_ROOT + '/lib/models.rb'
 require APP_ROOT + '/lib/helpers.rb'
 
 PAGE_SIZE = 100
-API_URL = 'http://www.apileipzig.de/api/v1/'
+API_URL = 'http://quiet-moon-3507.herokuapp.com/'
