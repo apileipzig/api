@@ -5,7 +5,8 @@ class DistrictTest < Test::Unit::TestCase
   def setup
     super
     @source = '/district'
-    api_user.permissions = create_permissions_for(District, :read)
+    @api_user = FactoryGirl.create(:user)
+    @api_user.permissions = create_permissions_for(District, :read)
     FactoryGirl.create(:district, :number => 1, :name => "Zentrum", :id => 1)
     FactoryGirl.create(:district, :number => 2, :name => "West", :id => 2)
   end
