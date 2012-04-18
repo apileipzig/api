@@ -72,15 +72,18 @@ class EventTest < Test::Unit::TestCase
       assert Event.new.respond_to? :owner
     end
 
+  end
+
+  context "[Ownership] Event#owned_by_or_public" do
+
     should "return private events owned by the owner" do
       event_owner  = Factory.create(:user)
       first_event  = Factory.create(:event, :owner => event_owner, :public => false)
       second_event = Factory.create(:event, :public => false)
-      assert_equal [first_event], Event.owner(event_owner.single_access_token).all
+      assert_equal [first_event], Event.owned_by_or_public(event_owner.single_access_token).all
     end
 
   end
-
 
 
 end
