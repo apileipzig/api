@@ -4,5 +4,6 @@ config.yml
 *.log
 .bundle/
 db/*.sqlite3
-
+coverage/
 .rvmrc
+tmp/

@@ -143,11 +143,13 @@ class Event < ActiveRecord::Base
   validates_format_of :document_url, :with => /^(http|https)\:\/\/[a-zA-Z0-9\-\.]+[a-zA-Z0-9\-]+\.[a-zA-Z]{2,4}(\/\S*)?$/, :allow_nil => true
 
   def format_of_time_from
-    errors.add(:time_from, "is invalid.") unless time_from_before_type_cast =~ /^[0-2]{1}[0-9]{1}\:[0-5]{1}[0-9]{1}\:[0-5]{1}[0-9]{1}$/ unless time_from_before_type_cast.nil?
+    return if time_from_before_type_cast.nil?
+    errors.add(:time_from, "is invalid.") unless time_from_before_type_cast =~ /^[0-2]{1}[0-9]{1}\:[0-5]{1}[0-9]{1}\:[0-5]{1}[0-9]{1}$/
   end
 
   def format_of_time_to
-    errors.add(:time_to, "is invalid.") unless time_to_before_type_cast =~ /^[0-2]{1}[0-9]{1}\:[0-5]{1}[0-9]{1}\:[0-5]{1}[0-9]{1}$/ unless time_to_before_type_cast.nil?
+    return if time_to_before_type_cast.nil?
+    errors.add(:time_to, "is invalid.") unless time_to_before_type_cast =~ /^[0-2]{1}[0-9]{1}\:[0-5]{1}[0-9]{1}\:[0-5]{1}[0-9]{1}$/ 
   end
 
   def existence_of_category_id

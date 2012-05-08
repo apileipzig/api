@@ -54,8 +54,6 @@ helpers do
     params.delete_if{|k,v| v.kind_of?(Array)}.each do |k,v|
       if k == 'limit' or k == 'offset'
         bad_params << k unless v.match(/^\d+$/) unless v.nil?
-      else
-        bad_params << k unless v.match(/^[^(\;\'\"\&\?\$)]*$/) unless v.nil?
       end
     end
 

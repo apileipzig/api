@@ -23,7 +23,7 @@ require 'config'
 
   get '/:source/?' do
     #TODO: throw other error her, maybe a help message
-    throw_error 400
+    throw_error 400, :message => "Wrong url format."
   end
 
   #request a list in rest/rails style

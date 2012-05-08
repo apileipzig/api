@@ -9,6 +9,11 @@ module Api
       assert_json(json_string, &block)
     end
 
+    def assert_error_on(attribute, record)
+      record.valid?
+      assert !record.errors[attribute].empty?, "Expected record: #{record.inspect} to have errors on attribute: #{attribute} when set to #{record.send(attribute)}"
+    end
+
   end
 
 end
