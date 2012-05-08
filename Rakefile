@@ -17,6 +17,9 @@ Rake::TestTask.new do |t|
   t.ruby_opts = ['-r test_helper']
 end
 
+#alias shortcut
+task :test => 'test:all'
+
 desc "Run all model tests"
 Rake::TestTask.new do |t|
   t.name = "test:models"
