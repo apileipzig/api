@@ -72,24 +72,27 @@ class Test::Unit::TestCase
   end
 
   # override rack-test's get method in order to add some default values
-  def post(url, opts={})
+  def post(url, opts={}, env={})
     opts[:api_key] ||= @api_user.api_key
-    super(url, opts)
+    env['REQUEST_URI'] ||= API_URL + url.gsub(/^\/{1}/, '')
+    super(url, opts, env)
   end
 
-  def get(url, opts={})
+  def get(url, opts={}, env={})
     opts[:api_key] ||= @api_user.api_key
-    super(url, opts)
+    env['REQUEST_URI'] ||= API_URL + url.gsub(/^\/{1}/, '')
+    super(url, opts, env)
   end
 
-  def put(url, opts={})
+  def put(url, opts={}, env={})
     opts[:api_key] ||= @api_user.api_key
-    super(url, opts)
+    env['REQUEST_URI'] ||= API_URL + url.gsub(/^\/{1}/, '')
+    super(url, opts, env)
   end
 
-  def delete(url, opts={})
+  def delete(url, opts={}, env={})
     opts[:api_key] ||= @api_user.api_key
-    super(url, opts)
+    env['REQUEST_URI'] ||= API_URL + url.gsub(/^\/{1}/, '')
+    super(url, opts, env)
   end
-
 end

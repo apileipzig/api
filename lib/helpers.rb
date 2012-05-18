@@ -100,7 +100,7 @@ helpers do
 
         #only next if limit+offset < count
         ne = params[:offset] + params[:limit]
-        output[:paging][:next] = url+'offset='+ne.to_s unless ne > count
+        output[:paging][:next] = url+'offset='+ne.to_s unless ne >= count
 
         #only previous if offset > 0
         if params[:offset] > 0
