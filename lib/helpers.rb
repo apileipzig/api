@@ -92,11 +92,11 @@ helpers do
         output[:paging] = {}
         params[:offset] = 0 if params[:offset].nil?
         query_string = ""
-        request.env['rack.request.query_hash'].each { |k,v| query_string += "#{k}=#{v}&" unless k == 'offset' }
+        request.env['rack.request.query_hash'].each { |k,v| query_string += "#{k}=#{v}&" unless ['offset', 'limit', 'api_key'].include? k}
 
         search = request.env['REQUEST_URI'].match(/[\w\/]+(\/search\/?\?)/) ? Regexp.last_match(1) : "?"
 
-        url = API_URL+params[:source]+'/'+params[:model]+search+query_string
+        url = "#{API_URL}#{params[:source]}/#{params[:model]}#{search}api_key=#{params[:api_key]}&#{query_string}limit=#{params[:limit].to_s}&"
 
         #only next if limit+offset < count
         ne = params[:offset] + params[:limit]

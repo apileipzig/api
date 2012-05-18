@@ -88,14 +88,14 @@ class PaginationTest < Test::Unit::TestCase
     should 'have the correct request url' do
       get '/mediahandbook/companies', :limit => 5, :offset => 2
       assert_status 200
-      assert_equal "#{API_URL}mediahandbook/companies?limit=5&api_key=#{@api_user.single_access_token}&offset=7", last_result['paging']['next']
+      assert_equal "#{API_URL}mediahandbook/companies?api_key=#{@api_user.single_access_token}&limit=5&offset=7", last_result['paging']['next']
     end
 
     should 'have the correct request url when searching' do
       #trailing ? is a hack for testing
       get '/mediahandbook/companies/search?', :q => 'a', :limit => 5, :offset => 2
       assert_status 200
-      assert_equal "#{API_URL}mediahandbook/companies/search?q=a&limit=5&api_key=#{@api_user.single_access_token}&offset=7", last_result['paging']['next']
+      assert_equal "#{API_URL}mediahandbook/companies/search?api_key=#{@api_user.single_access_token}&q=a&limit=5&offset=7", last_result['paging']['next']
     end
   end
 
@@ -103,7 +103,7 @@ class PaginationTest < Test::Unit::TestCase
     should 'have the correct request url' do
       get '/mediahandbook/companies', :limit => 2, :offset => 5
       assert_status 200
-      assert_equal "#{API_URL}mediahandbook/companies?limit=2&api_key=#{@api_user.single_access_token}&offset=3", last_result['paging']['previous']
+      assert_equal "#{API_URL}mediahandbook/companies?api_key=#{@api_user.single_access_token}&limit=2&offset=3", last_result['paging']['previous']
     end
 
     should 'have the correct request url when searching' do
@@ -111,7 +111,7 @@ class PaginationTest < Test::Unit::TestCase
       get '/mediahandbook/companies/search?', :q => 'a', :limit => 2, :offset => 5
       #assert_status 200
       puts last_response.inspect
-      assert_equal "#{API_URL}mediahandbook/companies/search?q=a&limit=2&api_key=#{@api_user.single_access_token}&offset=3", last_result['paging']['previous']
+      assert_equal "#{API_URL}mediahandbook/companies/search?api_key=#{@api_user.single_access_token}&q=a&limit=2&offset=3", last_result['paging']['previous']
     end
   end
 end
